@@ -38,3 +38,9 @@ out/
 
 ### properties ###
 src/main/resources/application.properties
+
+# IntelliJ IDEA 프로젝트 파일 제외
+.idea/
+*.iml
+out/
+gen/

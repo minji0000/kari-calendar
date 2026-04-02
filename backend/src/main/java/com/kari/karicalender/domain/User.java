@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -46,6 +49,10 @@ public class User extends BaseTimeEntity {
 
     // 가입 경로 (LOCAL, KAKAO 등)
     private String provider;
+
+    // 이 사용자가 만든 약속들 (참조용)
+    @OneToMany(mappedBy = "creator")
+    private List<Schedule> mySchedules = new ArrayList<>();
 
     @Builder
     public User(String userId, String password, String realName, String nickname,
