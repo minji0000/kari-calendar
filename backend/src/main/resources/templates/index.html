@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kari Calendar</title>
+    <style>
+        body { font-family: 'Pretendard', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #fffafb; }
+        .logo { font-size: 3rem; font-weight: bold; color: #ff9a9e; margin-bottom: 2.5rem; }
+        .btn-group { display: flex; flex-direction: column; gap: 1.2rem; width: 85%; max-width: 320px; }
+        .btn { padding: 1.2rem; border-radius: 15px; font-size: 1.1rem; text-decoration: none; text-align: center; font-weight: 600; transition: 0.2s; }
+        .btn-login { background-color: #ff9a9e; color: white; border: none; }
+        .btn-join { background-color: white; color: #ff9a9e; border: 2px solid #ff9a9e; }
+        .btn:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+<div class="logo">Kari Cal 🌸</div>
+<div class="btn-group">
+    <a th:href="@{/login}" class="btn btn-login">로그인</a>
+    <a th:href="@{/join}" class="btn btn-join">회원가입</a>
+</div>
+</body>
+</html>

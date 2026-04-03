@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - Kari Cal</title>
+    <style>
+        body { font-family: 'Pretendard', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #fffafb; }
+        .login-container { width: 85%; max-width: 350px; background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(255, 154, 158, 0.1); }
+        h2 { color: #ff9a9e; text-align: center; margin-bottom: 2rem; }
+        .input-group { margin-bottom: 1.2rem; }
+        input { width: 100%; padding: 1rem; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 1rem; }
+        .btn-submit { width: 100%; padding: 1rem; border: none; border-radius: 12px; background-color: #ff9a9e; color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 1rem; }
+        .error-msg { color: #ff4d4d; font-size: 0.9rem; text-align: center; margin-top: 1rem; }
+        .back-link { display: block; text-align: center; margin-top: 1.5rem; color: #999; text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>로그인</h2>
+    <form th:action="@{/login}" method="post">
+        <div class="input-group">
+            <input type="text" name="userId" placeholder="아이디" required>
+        </div>
+        <div class="input-group">
+            <input type="password" name="password" placeholder="비밀번호" required>
+        </div>
+        <button type="submit" class="btn-submit">시작하기</button>
+
+        <p th:if="${error}" class="error-msg" th:text="${error}"></p>
+    </form>
+    <a href="/" class="back-link">이전으로</a>
+</div>
+</body>
+</html>

@@ -26,7 +26,7 @@ public class User extends BaseTimeEntity {
     private String password;
 
     // 본명
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String realName;
 
     // 서비스 닉네임
