@@ -1,8 +1,10 @@
 package com.kari.karicalender.service;
 
 import com.kari.karicalender.domain.User;
+import com.kari.karicalender.dto.user.UserDto;
 import com.kari.karicalender.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,13 +14,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     /**
      * 회원가입
      */
     @Transactional
-    public Long join(User user) {
-        validateDuplicateUser(user); // 중복 검사 로직
+    public Long join(UserDto userDto) {
+        validateDuplicateUser(userDto);
+
+        // 엔티티로 변환할 때 암호화된 비밀번호를 바로 넣어주기
+        User user = User.builder()
+                .userId(userDto.getUserId())
+                .password(passwordEncoder.encode(userDto.getPassword())) // 여기서 바로 암호화!
+                .nickname(userDto.getNickname())
+                .provider("LOCAL")
+                // ... 나머지 필드들 ...
+                .build();
+
         userRepository.save(user);
         return user.getId();
     }
@@ -26,11 +39,11 @@ public class UserService {
     /**
      * 아이디 & 닉네임 중복 체크
      */
-    private void validateDuplicateUser(User user) {
-        if (userRepository.existsByUserId(user.getUserId())) {
+    private void validateDuplicateUser(UserDto userDto) {
+        if (userRepository.existsByUserId(userDto.getUserId())) {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
         }
-        if (userRepository.existsByNickname(user.getNickname())) {
+        if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new IllegalStateException("이미 존재하는 닉네임입니다.");
         }
     }

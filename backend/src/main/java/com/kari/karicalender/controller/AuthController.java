@@ -1,11 +1,13 @@
 package com.kari.karicalender.controller;
 
 import com.kari.karicalender.domain.User;
+import com.kari.karicalender.dto.user.UserDto;
 import com.kari.karicalender.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -42,37 +44,24 @@ public class AuthController {
     }
 
     /**
-     * 회원가입
+     * 회원가입 페이지 이동
+     */
+    @GetMapping("/join")
+    public String joinPage() {
+        return "join"; // templates/join.html 파일을 보여줍니다.
+    }
+
+    /**
+     * 회원가입 로직
      */
     @PostMapping("/join")
-    public String join(@RequestParam("userId") String userId,
-                       @RequestParam("password") String password,
-                       @RequestParam("nickname") String nickname,
-                       @RequestParam(value = "realName", required = false) String realName,
-                       @RequestParam(value = "email", required = false) String email,
-                       @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
-                       @RequestParam(value = "birthday", required = false) String birthday,
-                       @RequestParam(value = "gender", required = false) String gender,
-                       @RequestParam("provider") String provider,
-                       Model model) {
+    public String join(@ModelAttribute UserDto userDto, Model model) {
         try {
-            User user = User.builder()
-                    .userId(userId)
-                    .password(password)
-                    .nickname(nickname)
-                    .realName(realName)
-                    .email(email)
-                    .phoneNumber(phoneNumber)
-                    .birthday(birthday)
-                    .gender(gender)
-                    .provider(provider)
-                    .build();
-
-            userService.join(user);
+            userService.join(userDto);
             return "redirect:/login";
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             model.addAttribute("error", e.getMessage());
-            return "join";
+            return "join"; // 중복 시 에러 메시지와 함께 다시 회원가입 폼으로
         }
     }
 }
