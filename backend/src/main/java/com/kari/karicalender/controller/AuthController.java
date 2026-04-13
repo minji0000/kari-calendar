@@ -4,12 +4,10 @@ import com.kari.karicalender.domain.User;
 import com.kari.karicalender.dto.user.UserDto;
 import com.kari.karicalender.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -55,13 +53,14 @@ public class AuthController {
      * 회원가입 로직
      */
     @PostMapping("/join")
-    public String join(@ModelAttribute UserDto userDto, Model model) {
+    @ResponseBody
+    public ResponseEntity<?> join(@ModelAttribute UserDto userDto, Model model) {
         try {
             userService.join(userDto);
-            return "redirect:/login";
+            return ResponseEntity.ok().body("success");
         } catch (IllegalStateException e) {
-            model.addAttribute("error", e.getMessage());
-            return "join"; // 중복 시 에러 메시지와 함께 다시 회원가입 폼으로
+            // 중복 오류 등을 400 에러와 함께 메시지로 전달
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

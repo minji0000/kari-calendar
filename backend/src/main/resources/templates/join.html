@@ -13,8 +13,8 @@
         label { display: block; margin-bottom: 0.4rem; color: #666; font-size: 0.85rem; font-weight: 600; }
         input, select { width: 100%; padding: 0.9rem; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 1rem; background-color: #fcfcfc; }
         input:focus { outline: none; border-color: #ff9a9e; background-color: white; }
-        .gender-group { display: flex; gap: 10px; }
         .btn-submit { width: 100%; padding: 1.1rem; border: none; border-radius: 12px; background-color: #ff9a9e; color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 2rem; }
+        .btn-submit:disabled { background-color: #ccc; cursor: not-allowed; }
         .error-msg { color: #ff4d4d; font-size: 0.85rem; text-align: center; margin-top: 10px; }
     </style>
 </head>
@@ -37,7 +37,7 @@
             <input type="text" name="nickname" placeholder="서비스에서 사용할 이름" required>
         </div>
 
-        <div class="section-title">추가 정보(여기 밑에는 귀찮으면 입력 안 해도 돼 !)</div>
+        <div class="section-title">추가 정보</div>
         <div class="input-group">
             <label>이름</label>
             <input type="text" name="realName" placeholder="본명 입력">
@@ -65,9 +65,50 @@
 
         <input type="hidden" name="provider" value="LOCAL">
 
-        <button type="submit" class="btn-submit">가입 완료</button>
-        <p th:if="${error}" class="error-msg" th:text="${error}"></p>
+        <button type="button" class="btn-submit" onclick="handleJoin()">가입 완료</button>
     </form>
 </div>
+
+<script th:inline="javascript">
+    async function handleJoin() {
+        const form = document.querySelector('form');
+        const btn = document.querySelector('.btn-submit');
+
+        // 1. 필수값 간단 체크
+        if(!form.userId.value || !form.password.value || !form.nickname.value) {
+            alert("필수 정보를 모두 입력해주세요! 🌸");
+            return;
+        }
+
+        // 중복 클릭 방지 (버튼 비활성화)
+        btn.disabled = true;
+
+        // 2. 데이터 준비
+        const formData = new FormData(form);
+
+        try {
+            // 3. 서버에 비동기 요청 전송
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            // 4. 응답 처리
+            if (response.ok) {
+                alert("가입을 축하합니다! 로그인 페이지로 이동할게요. ✨");
+                window.location.href = "/login";
+            } else {
+                // 서버 에러 메시지 읽기
+                const errorMsg = await response.text();
+                alert(errorMsg); // "이미 존재하는 아이디입니다" 등
+                btn.disabled = false; // 실패 시 다시 버튼 활성화
+            }
+        } catch (error) {
+            console.error("네트워크 에러:", error);
+            alert("서버 통신 중 오류가 발생했습니다.");
+            btn.disabled = false;
+        }
+    }
+</script>
 </body>
 </html>
