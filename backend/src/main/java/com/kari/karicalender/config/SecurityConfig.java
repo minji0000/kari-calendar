@@ -25,7 +25,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
-                        .loginPage("/login") // 우리가 만든 로그인 페이지 주소
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login") // 로그인 처리를 담당할 URL (폼의 action과 일치)
+                        .usernameParameter("userId") //Spring Security 기본값은 username
+                        .passwordParameter("password")
                         .defaultSuccessUrl("/", true) // 로그인 성공하면 갈 곳
                         .permitAll()
                 );

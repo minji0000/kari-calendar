@@ -16,30 +16,20 @@ public class AuthController {
     private final UserService userService;
 
     /**
-     * 🔑 로그인 페이지 이동
+     * 🔑 로그인 페이지 이동 (에러 메시지 처리 포함)
      */
     @GetMapping("/login")
-    public String loginForm() {
-        return "login"; // templates/login.html을 찾아가요
+    public String loginForm(@RequestParam(value = "error", required = false) String error,
+                            Model model) {
+
+        // 주소창에 ?error 가 붙어서 들어왔을 때만 실행
+        if (error != null) {
+            model.addAttribute("error", "아이디 또는 비밀번호가 맞지 않아요. 다시 확인해주세요! 🌸");
+        }
+
+        return "login"; // templates/login.html
     }
 
-    /**
-     * 🚀 실제 로그인 로직 처리
-     */
-    @PostMapping("/login")
-    public String login(@RequestParam("userId") String userId,
-                        @RequestParam("password") String password,
-                        Model model) {
-        try {
-            User loginUser = userService.login(userId, password);
-            // 로그인 성공!
-            return "redirect:/";
-        } catch (IllegalArgumentException e) {
-            // 로그인 실패 시 에러 메시지를 담아서 다시 로그인 페이지로!
-            model.addAttribute("error", e.getMessage());
-            return "login";
-        }
-    }
 
     /**
      * 회원가입 페이지 이동

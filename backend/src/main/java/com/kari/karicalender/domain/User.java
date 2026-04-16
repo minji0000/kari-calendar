@@ -33,8 +33,7 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, unique = true)
     private String nickname;
 
-    // 전화번호 (중복 가입 방지)
-    @Column(unique = true)
+    // 전화번호
     private String phoneNumber;
 
     // 생년월일 (8자리: 19950527)
