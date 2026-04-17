@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>나의 달력 목록 - Kari Calendar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 메인 레이아웃 스타일 */
+        .main-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 상단 바 (프로필 버튼 포함) */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-btn {
+            background: #eee;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* 달력 리스트 스타일 */
+        .calendar-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .calendar-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            cursor: pointer;
+            border: 1px solid #f0f0f0;
+        }
+
+        .calendar-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* 우측 하단 플로팅 버튼 (+) */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #ff6b6b; /* 포인트 컬러 */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .fab:hover {
+            background-color: #ee5253;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <header class="header">
+        <h1>나의 일정</h1>
+        <button class="profile-btn" onclick="location.href='/profile'">
+            <i class="fa-solid fa-user"></i> </button>
+    </header>
+
+    <div class="calendar-list">
+        <div class="calendar-card">
+            <h3>우리 가족 달력 👨‍👩‍👧</h3>
+            <p>참여 인원: 4명</p>
+        </div>
+        <div class="calendar-card">
+            <h3>개발 프로젝트 일정 💻</h3>
+            <p>참여 인원: 3명</p>
+        </div>
+    </div>
+</div>
+
+<a href="/calendar/new" class="fab">
+    <i class="fa-solid fa-plus"></i>
+</a>
+
+</body>
+</html>

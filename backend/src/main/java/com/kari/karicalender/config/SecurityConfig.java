@@ -1,5 +1,7 @@
 package com.kari.karicalender.config;
 
+import com.kari.karicalender.config.auth.LoginUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,7 +11,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final LoginUserService loginUserService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -29,9 +34,10 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login") // 로그인 처리를 담당할 URL (폼의 action과 일치)
                         .usernameParameter("userId") //Spring Security 기본값은 username
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/", true) // 로그인 성공하면 갈 곳
+                        .defaultSuccessUrl("/main", true) // 로그인 성공하면 갈 곳
                         .permitAll()
-                );
+                )
+                .userDetailsService(loginUserService);
 
         return http.build();
     }
