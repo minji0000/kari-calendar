@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>새 달력 만들기 - Kari Calendar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .form-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        h2 { margin-bottom: 25px; color: #333; text-align: center; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box; /* 패딩이 너비를 안 넘치게 */
+        }
+        .color-picker { display: flex; gap: 15px; margin-top: 10px; }
+        .color-option {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+        /* 라디오 버튼은 숨기고 색상 동그라미만 보이게 */
+        .color-option input { display: none; }
+        .color-option:has(input:checked) { border-color: #333; transform: scale(1.2); }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2><i class="fa-solid fa-calendar-plus"></i> 새 달력 만들기</h2>
+
+    <form action="/calendar/register" method="post">
+        <div class="form-group">
+            <label>달력 제목</label>
+            <input type="text" name="title" placeholder="예: 우리 가족 달력, 공부 모임" required>
+        </div>
+
+        <div class="form-group">
+            <label>모임 설명</label>
+            <textarea name="description" rows="3" placeholder="어떤 모임인지 간단히 적어주세요"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>달력 테마 컬러</label>
+            <div class="color-picker">
+                <label class="color-option" style="background-color: #ff6b6b;">
+                    <input type="radio" name="color" value="#ff6b6b" checked>
+                </label>
+                <label class="color-option" style="background-color: #4ecdc4;">
+                    <input type="radio" name="color" value="#4ecdc4">
+                </label>
+                <label class="color-option" style="background-color: #45aaf2;">
+                    <input type="radio" name="color" value="#45aaf2">
+                </label>
+                <label class="color-option" style="background-color: #fed330;">
+                    <input type="radio" name="color" value="#fed330">
+                </label>
+                <label class="color-option" style="background-color: #a55eea;">
+                    <input type="radio" name="color" value="#a55eea">
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">생성하기</button>
+        <button type="button" onclick="history.back()" style="width:100%; background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">취소</button>
+    </form>
+</div>
+
+</body>
+</html>

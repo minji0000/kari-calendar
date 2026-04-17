@@ -11,6 +11,6 @@ public class MainController {
     * */
     @GetMapping("/main")
     public String home() {
-        return "main";
+        return "calendar/main";
     }
 }
