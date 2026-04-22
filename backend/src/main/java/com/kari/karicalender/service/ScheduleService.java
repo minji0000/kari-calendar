@@ -19,10 +19,9 @@ public class ScheduleService {
     /**
      * 새로운 일정 등록
      */
-    @Transactional //(등록/수정삭제) 가능
-    public Long register(ScheduleRequestDto dto, User creator) {
+    @Transactional
+    public String register(ScheduleRequestDto dto, User creator) { // 반환 타입을 String으로!
 
-        //공유키 생성
         String shareKey = UUID.randomUUID().toString();
 
         Schedule schedule = Schedule.builder()
@@ -32,7 +31,13 @@ public class ScheduleService {
                 .shareKey(shareKey)
                 .build();
 
-        return scheduleRepository.save(schedule).getId();
+        scheduleRepository.save(schedule);
+
+        return shareKey; // 저장된 일정의 공유키를 반환!
     }
 
+    public Schedule findByShareKey(String shareKey) {
+        return scheduleRepository.findByShareKey(shareKey)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일정이거나 잘못된 초대 링크입니다."));
+    }
 }

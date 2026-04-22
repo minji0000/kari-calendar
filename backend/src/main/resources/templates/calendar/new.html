@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>새 달력 만들기 - Kari Calendar</title>
+    <title>Kari Calendar</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -54,38 +54,17 @@
 <body>
 
 <div class="form-container">
-    <h2><i class="fa-solid fa-calendar-plus"></i> 새 달력 만들기</h2>
+    <h2><i class="fa-solid fa-calendar-plus"></i> 새 일정 만들기</h2>
 
-    <form action="/calendar/register" method="post">
+    <form action="/schedule/register" method="post">
         <div class="form-group">
-            <label>달력 제목</label>
-            <input type="text" name="title" placeholder="예: 우리 가족 달력, 공부 모임" required>
+            <label>일정 제목</label>
+            <input type="text" name="title" placeholder="ex: 클라이밍, 정모, 우리 언제 만날래?" required>
         </div>
 
         <div class="form-group">
-            <label>모임 설명</label>
-            <textarea name="description" rows="3" placeholder="어떤 모임인지 간단히 적어주세요"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>달력 테마 컬러</label>
-            <div class="color-picker">
-                <label class="color-option" style="background-color: #ff6b6b;">
-                    <input type="radio" name="color" value="#ff6b6b" checked>
-                </label>
-                <label class="color-option" style="background-color: #4ecdc4;">
-                    <input type="radio" name="color" value="#4ecdc4">
-                </label>
-                <label class="color-option" style="background-color: #45aaf2;">
-                    <input type="radio" name="color" value="#45aaf2">
-                </label>
-                <label class="color-option" style="background-color: #fed330;">
-                    <input type="radio" name="color" value="#fed330">
-                </label>
-                <label class="color-option" style="background-color: #a55eea;">
-                    <input type="radio" name="color" value="#a55eea">
-                </label>
-            </div>
+            <label>일정 설명</label>
+            <textarea name="description" rows="3" placeholder="어떤 일정인지 간단히 적어주세요"></textarea>
         </div>
 
         <button type="submit" class="btn-submit">생성하기</button>
