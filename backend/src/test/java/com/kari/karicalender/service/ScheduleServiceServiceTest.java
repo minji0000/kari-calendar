@@ -4,39 +4,46 @@ import com.kari.karicalender.domain.Schedule;
 import com.kari.karicalender.domain.User;
 import com.kari.karicalender.dto.schedule.ScheduleRequestDto;
 import com.kari.karicalender.repository.ScheduleRepository;
+import com.kari.karicalender.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
-@Transactional // 테스트 후 데이터를 롤백해줘서 DB가 깨끗하게 유지돼요!
-class ScheduleServiceServiceTest {
+@Transactional
+class ScheduleServiceTest { // 이름 살짝 정리!
 
-    @Autowired ScheduleService scheduleService;
+    @Autowired
+    ScheduleService scheduleService;
     @Autowired ScheduleRepository scheduleRepository;
+    @Autowired UserRepository userRepository; // 유저를 찾아오기 위해 추가!
 
     @Test
-    @DisplayName("새로운 일정을 생성하고 공유키로 조회할 수 있어야 한다")
-    void registerAndFindTest() {
-        // 1. Given (준비)
+    @DisplayName("로그인한 사용자가 일정을 생성하고 상세 페이지용 키를 받는다")
+    void registerWithUserTest() {
+        // 1. Given (실제 DB에 있는 test 유저를 가져옴)
+        // 만약 DB에 test가 없다면 회원가입 로직을 먼저 실행하거나 직접 넣어줘야 해요!
+        User user = userRepository.findByUserId("test")
+                .orElseThrow(() -> new IllegalArgumentException("테스트 유저가 없어요! 먼저 가입시켜주세요."));
+
         ScheduleRequestDto dto = new ScheduleRequestDto();
-        dto.setTitle("민지랑 클라이밍 🧗‍♀️");
-        dto.setDescription("퇴근하고 판교에서 모여요!");
+        dto.setTitle("민지의 첫 테스트 일정");
+        dto.setDescription("테스트 일정입니다");
 
-        // creator는 null로 테스트하거나, 필요시 가짜 유저를 생성하세요.
-        User mockUser = null;
-
-        // 2. When (실행)
-        String shareKey = scheduleService.register(dto, mockUser);
-        Schedule foundSchedule = scheduleService.findByShareKey(shareKey);
+        // 2. When (서비스 실행)
+        String shareKey = scheduleService.register(dto, user);
 
         // 3. Then (검증)
-        assertThat(foundSchedule.getTitle()).isEqualTo("민지랑 클라이밍 🧗‍♀️");
-        assertThat(foundSchedule.getShareKey()).isEqualTo(shareKey);
-        System.out.println("생성된 공유키: " + shareKey);
+        Schedule found = scheduleService.findByShareKey(shareKey);
+
+        assertThat(found.getTitle()).isEqualTo("민지의 첫 테스트 일정");
+        assertThat(found.getCreator().getUserId()).isEqualTo("test"); // 만든 사람이 'test'가 맞는지 확인!
+        assertThat(found.getShareKey()).isNotNull(); // 공유키가 잘 생성됐는지 확인!
+
+        System.out.println("테스트 성공! 생성된 공유키: " + shareKey);
     }
 }
