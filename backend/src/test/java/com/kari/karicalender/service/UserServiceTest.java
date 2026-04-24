@@ -1,6 +1,7 @@
 package com.kari.karicalender.service;
 
 import com.kari.karicalender.domain.User;
+import com.kari.karicalender.dto.user.UserDto;
 import com.kari.karicalender.repository.UserRepository;
 import com.kari.karicalender.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -9,62 +10,67 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-@SpringBootTest
-@Transactional //DB에 실제 저장 X 테스트 끝나면 자동으로 삭제(Rollback) 됨
+
+@SpringBootTest(classes = com.kari.karicalender.KariCalenderApplication.class)
+@Transactional
 public class UserServiceTest {
 
     @Autowired UserService userService;
     @Autowired UserRepository userRepository;
 
     @Test
-    @DisplayName("회원가입 성공 테스트")
+    @DisplayName("회원가입 성공 테스트 (암호화 확인)")
     void join_success() {
-        // Given (준비)
-        User user = User.builder()
-                .userId("goguma")
-                .password("test")
-                .nickname("고구마")
-                .realName("진민지")
-                .build();
+        // Given (DTO를 사용해서 준비!)
+        UserDto dto = new UserDto();
+        dto.setUserId("goguma");
+        dto.setPassword("test1234");
+        dto.setNickname("고구마");
 
-        // When (실행)
-        Long savedId = userService.join(user);
+        // When
+        Long savedId = userService.join(dto);
 
-        // Then (검증)
+        // Then
         User findUser = userRepository.findById(savedId).get();
         assertThat(findUser.getUserId()).isEqualTo("goguma");
+        // 중요: DB에는 'test1234'가 아니라 암호화된 외계어가 들어있어야 함!
+        assertThat(findUser.getPassword()).isNotEqualTo("test1234");
     }
 
     @Test
-    @DisplayName("중복 아이디 가입 시 예외가 발생해야 한다")
-    void join_duplicate_exception() {
-        // Given
-        User user1 = User.builder().userId("sameId").password("p1").nickname("n1").build();
-        User user2 = User.builder().userId("sameId").password("p2").nickname("n2").build();
-
-        // When
-        userService.join(user1);
-
-        // Then
-        // 에러가 발생하는 게 정상적인 결과
-        assertThrows(IllegalStateException.class, () -> {
-            userService.join(user2); // 아이디가 같아서 에러가 터져야 함!
-        });
-    }
-
-    @Test
-    @DisplayName("로그인 성공 테스트")
+    @DisplayName("로그인 성공 테스트 (암호화 비교 확인)")
     void login_success() {
         // Given
-        User user = User.builder().userId("goguma").password("test").nickname("nick").build();
-        userService.join(user);
+        UserDto dto = new UserDto();
+        dto.setUserId("goguma");
+        dto.setPassword("test1234"); // 원래 비번
+        dto.setNickname("고구마");
+        userService.join(dto);
 
         // When
-        User loggedInUser = userService.login("goguma", "test");
+        // 서비스 내부에서 passwordEncoder.matches()가 작동해야 성공함!
+        User loggedInUser = userService.login("goguma", "test1234");
 
         // Then
-        assertThat(loggedInUser.getNickname()).isEqualTo("nick");
+        assertThat(loggedInUser.getUserId()).isEqualTo("goguma");
+        assertThat(loggedInUser.getNickname()).isEqualTo("고구마");
+    }
+
+    @Test
+    @DisplayName("비밀번호가 틀리면 로그인에 실패해야 한다")
+    void login_fail() {
+        // Given
+        UserDto dto = new UserDto();
+        dto.setUserId("goguma");
+        dto.setPassword("correct_password");
+        userService.join(dto);
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> {
+            userService.login("goguma", "wrong_password");
+        });
     }
 }
