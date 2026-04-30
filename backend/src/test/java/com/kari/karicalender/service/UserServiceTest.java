@@ -66,6 +66,7 @@ public class UserServiceTest {
         UserDto dto = new UserDto();
         dto.setUserId("goguma");
         dto.setPassword("correct_password");
+        dto.setNickname("고구마");
         userService.join(dto);
 
         // When & Then

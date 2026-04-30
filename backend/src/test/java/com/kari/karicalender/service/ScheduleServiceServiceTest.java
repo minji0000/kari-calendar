@@ -15,12 +15,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
 @Transactional
-class ScheduleServiceTest { // 이름 살짝 정리!
+class ScheduleServiceTest {
 
     @Autowired
     ScheduleService scheduleService;
     @Autowired ScheduleRepository scheduleRepository;
-    @Autowired UserRepository userRepository; // 유저를 찾아오기 위해 추가!
+    @Autowired UserRepository userRepository;
 
     @Test
     @DisplayName("로그인한 사용자가 일정을 생성하고 상세 페이지용 키를 받는다")

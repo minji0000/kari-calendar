@@ -22,6 +22,7 @@
 <div class="join-container">
     <h2>회원가입 🌸</h2>
     <form th:action="@{/join}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
         <div class="section-title">필수 정보</div>
         <div class="input-group">
@@ -83,6 +84,9 @@
         // 중복 클릭 방지 (버튼 비활성화)
         btn.disabled = true;
 
+        // CSRF 토큰 값 가져오기
+        const csrfToken = document.querySelector('input[name="_csrf"]').value;
+
         // 2. 데이터 준비
         const formData = new FormData(form);
 
@@ -90,6 +94,9 @@
             // 3. 서버에 비동기 요청 전송
             const response = await fetch(form.action, {
                 method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
                 body: formData
             });
 
