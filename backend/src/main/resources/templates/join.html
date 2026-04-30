@@ -34,6 +34,10 @@
             <input type="password" name="password" placeholder="비밀번호 입력" required>
         </div>
         <div class="input-group">
+            <label>비밀번호 확인</label>
+            <input type="password" name="passwordCheck" placeholder="비밀번호 다시 입력" required>
+        </div>
+        <div class="input-group">
             <label>닉네임</label>
             <input type="text" name="nickname" placeholder="서비스에서 사용할 이름" required>
         </div>
@@ -76,8 +80,24 @@
         const btn = document.querySelector('.btn-submit');
 
         // 1. 필수값 간단 체크
-        if(!form.userId.value || !form.password.value || !form.nickname.value) {
+        if(!form.userId.value || !form.password.value || !form.nickname.value || !form.passwordCheck.value) {
             alert("필수 정보를 모두 입력해주세요! 🌸");
+            return;
+        }
+
+        // 🌟 2. 비밀번호 규칙 체크 (영문, 숫자, 특수문자 중 2가지 이상 조합, 8~16자)
+        const passwordReg = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,16}$/;
+
+        if (!passwordReg.test(form.password.value)) {
+            alert("비밀번호는 영문과 숫자를 포함하여 8~16자로 설정해주세요! ✨");
+            form.password.focus();
+            return;
+        }
+
+        // 🌟 3. 비밀번호 일치 여부 체크
+        if(form.password.value !== form.passwordCheck.value) {
+            alert("비밀번호가 서로 다릅니다. 다시 확인해주세요! 🧐");
+            form.passwordCheck.focus(); // 확인 칸으로 커서 이동
             return;
         }
 

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -36,8 +37,20 @@ public class ScheduleService {
         return shareKey; // 저장된 일정의 공유키를 반환!
     }
 
+    /**
+    * 공유키 찾기
+    */
     public Schedule findByShareKey(String shareKey) {
         return scheduleRepository.findByShareKey(shareKey)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일정이거나 잘못된 초대 링크입니다."));
+    }
+
+    /**
+     * 내가 방장(creator_id)인 일정 목록 가져오기
+     */
+    @Transactional(readOnly = true)
+    public List<Schedule> findMySchedules(Long userId) {
+        // Repository에 findByCreatorId 메서드를 만들어야 해요!
+        return scheduleRepository.findByCreatorId(userId);
     }
 }

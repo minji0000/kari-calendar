@@ -2,79 +2,132 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>나의 달력 목록 - Kari Calendar</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kari Calendar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* 메인 레이아웃 스타일 */
+        :root {
+            --main-color: #ff9a9e;
+            --bg-color: #fffafb;
+            --owner-tag: #ff6b6b;
+            --member-tag: #45aaf2;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Pretendard', sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #444;
+        }
+
         .main-container {
             padding: 20px;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
-        /* 상단 바 (프로필 버튼 포함) */
+        /* 헤더 */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            color: var(--main-color);
+            margin: 0;
         }
 
         .profile-btn {
-            background: #eee;
+            background: white;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border: none;
+            border: 1px solid #ffebee;
+            box-shadow: 0 4px 10px rgba(255, 154, 158, 0.15);
+            color: var(--main-color);
+            transition: 0.3s;
         }
 
-        /* 달력 리스트 스타일 */
+        /* 섹션 타이틀 */
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+            margin: 40px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i { color: var(--main-color); }
+
+        /* 달력 카드 */
         .calendar-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 25px;
         }
 
         .calendar-card {
             background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(255, 154, 158, 0.1);
+            transition: all 0.3s ease;
             cursor: pointer;
-            border: 1px solid #f0f0f0;
+            border: 1px solid #fff5f6;
         }
 
         .calendar-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(255, 154, 158, 0.2);
         }
 
-        /* 우측 하단 플로팅 버튼 (+) */
+        .role-tag {
+            display: inline-block;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-weight: 800;
+        }
+
+        .tag-owner { background: #fff0f1; color: var(--owner-tag); border: 1px solid var(--owner-tag); }
+        .tag-member { background: #f0f7ff; color: var(--member-tag); border: 1px solid var(--member-tag); }
+
+        .calendar-card h3 { margin: 0 0 10px 0; font-size: 19px; color: #333; }
+        .calendar-card p { margin: 0; color: #888; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+
+        /* 하단 플로팅 버튼 (+) */
         .fab {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background-color: #ff6b6b; /* 포인트 컬러 */
+            bottom: 40px;
+            right: 40px;
+            width: 65px;
+            height: 65px;
+            background: var(--main-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 28px;
+            box-shadow: 0 8px 25px rgba(255, 154, 158, 0.4);
             text-decoration: none;
-            transition: background-color 0.2s;
+            transition: all 0.3s;
         }
 
         .fab:hover {
-            background-color: #ee5253;
+            background-color: #ff858a;
+            transform: rotate(90deg) scale(1.1);
         }
     </style>
 </head>
@@ -82,24 +135,54 @@
 
 <div class="main-container">
     <header class="header">
-        <h1>나의 일정</h1>
+        <h1>나의 일정 🌸</h1>
         <button class="profile-btn" onclick="location.href='/profile'">
-            <i class="fa-solid fa-user"></i> </button>
+            <i class="fa-solid fa-user"></i>
+        </button>
     </header>
 
+    <!-- 1. 내가 만든 달력 섹션 -->
+    <div class="section-title">
+        <i class="fa-solid fa-crown"></i> 내가 만든 일정
+    </div>
+    <!-- 내가 만든 달력 섹션 반복문 -->
     <div class="calendar-list">
-        <div class="calendar-card">
-            <h3>우리 가족 달력 👨‍👩‍👧</h3>
-            <p>참여 인원: 4명</p>
+        <!-- th:each를 사용해서 DB에서 가져온 개수만큼 카드를 생성해요! -->
+        <div class="calendar-card"
+             th:each="cal : ${ownerCalendars}"
+             th:data-sharekey="${cal.shareKey}"
+             onclick="location.href='/schedule/detail/' + this.getAttribute('data-sharekey')">
+
+            <span class="role-tag tag-owner">방장</span>
+            <h3 th:text="${cal.title}">일정 제목</h3>
+            <p>
+                <i class="fa-solid fa-calendar-days"></i>
+                생성일: <span th:text="${#temporals.format(cal.createdAt, 'yyyy-MM-dd')}">2026-04-30</span>
+            </p>
         </div>
-        <div class="calendar-card">
+
+        <!-- 만약 데이터가 하나도 없다면? -->
+        <div th:if="${#lists.isEmpty(ownerCalendars)}" class="empty-state">
+            아직 생성한 달력이 없어요. 우측 하단 + 버튼을 눌러보세요! ✨
+        </div>
+    </div>
+
+    <!-- 2. 공유받은 달력 섹션 -->
+    <div class="section-title">
+        <i class="fa-solid fa-handshake-angle"></i> 공유받은 일정
+    </div>
+    <div class="calendar-list">
+        <!-- 클릭 시 경로 수정: /schedule/detail/{shareKey} -->
+        <div class="calendar-card" onclick="location.href='/schedule/detail/KARI-SHARE-KEY'">
+            <span class="role-tag tag-member">참여</span>
             <h3>개발 프로젝트 일정 💻</h3>
-            <p>참여 인원: 3명</p>
+            <p><i class="fa-solid fa-users"></i> 참여 인원: 3명</p>
         </div>
     </div>
 </div>
 
-<a href="/calendar/new" class="fab">
+<!-- 🌟 새 일정 만들기 버튼 경로 수정: /schedule/new -->
+<a href="/schedule/new" class="fab" title="새 일정 만들기">
     <i class="fa-solid fa-plus"></i>
 </a>
 

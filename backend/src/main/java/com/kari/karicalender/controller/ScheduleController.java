@@ -10,6 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequestMapping("/schedule")
 @RequiredArgsConstructor
@@ -71,5 +74,22 @@ public class ScheduleController {
 
         model.addAttribute("calendar", dummy);
         return "calendar/detail";
+    }
+
+    /**
+     * 로그인한 유저의 일정 가져옴
+     */
+    @GetMapping("/main")
+    public String scheduleList(Model model, @AuthenticationPrincipal LoginUser loginUser) {
+        // 1. 현재 로그인한 유저의 ID로 생성한 일정들을 가져옴
+        List<Schedule> ownerCalendars = scheduleService.findMySchedules(loginUser.getUser().getId());
+
+        // 2. HTML에 "ownerCalendars"라는 이름으로 전달
+        model.addAttribute("ownerCalendars", ownerCalendars);
+
+        // 3. 참여 중인 일정은 아직 로직이 없다면 빈 리스트로 전달 (에러 방지)
+        model.addAttribute("memberCalendars", new ArrayList<>());
+
+        return "calendar/main";
     }
 }

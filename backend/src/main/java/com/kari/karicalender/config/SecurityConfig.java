@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login") // 로그인 처리를 담당할 URL (폼의 action과 일치)
                         .usernameParameter("userId") //Spring Security 기본값은 username
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/main", true) // 로그인 성공하면 갈 곳
+                        .defaultSuccessUrl("/schedule/main", true) // 로그인 성공하면 갈 곳
                         .permitAll()
                 )
                 .userDetailsService(loginUserService);
