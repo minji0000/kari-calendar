@@ -24,16 +24,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                // 1. CSRF 설정 추가: /api/로 시작하는 요청은 CSRF 검사를 하지 않음
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/**")
+                )
                 .authorizeHttpRequests(auth -> auth
+                        // 2. API 경로에 대한 권한 설정 (로그인한 사용자만 가능)
+                        .requestMatchers("/api/availability/**").authenticated()
                         .requestMatchers("/", "/login", "/join", "/css/**", "/js/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
                         .loginPage("/login")
-                        .loginProcessingUrl("/login") // 로그인 처리를 담당할 URL (폼의 action과 일치)
-                        .usernameParameter("userId") //Spring Security 기본값은 username
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("userId")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/schedule/main", true) // 로그인 성공하면 갈 곳
+                        .defaultSuccessUrl("/schedule/main", true)
                         .permitAll()
                 )
                 .userDetailsService(loginUserService);

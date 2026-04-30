@@ -131,12 +131,22 @@
         }
     </style>
 </head>
+
+<script>
+    function goToProfile() {
+        // 1. 알림창 띄우기
+        alert("아직 개발 안 했으니 일정이나 만들고 놀아! ✨");
+
+        // 2. 확인 버튼 누르면 페이지 이동
+        // location.href = '/profile';
+    }
+</script>
 <body>
 
 <div class="main-container">
     <header class="header">
         <h1>나의 일정 🌸</h1>
-        <button class="profile-btn" onclick="location.href='/profile'">
+        <button class="profile-btn" onclick="goToProfile()">
             <i class="fa-solid fa-user"></i>
         </button>
     </header>

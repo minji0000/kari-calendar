@@ -128,7 +128,7 @@
         <div class="info"><span id="selectCount">0</span>일 선택됨</div>
         <div class="color-selector" id="colorPicker"></div>
     </div>
-    <button class="btn-confirm" onclick="submitDates()">일정 등록하기</button>
+    <button class="btn-confirm" onclick="save()">일정 등록하기</button>
 </div>
 
 <script>
@@ -227,8 +227,52 @@
         navigator.clipboard.writeText(key).then(() => alert('코드가 복사되었습니다! 🌸'));
     }
 
-    function submitDates() {
-        alert(`선택된 색상: ${myColor}\n선택된 날짜들: ${selectedDates.join(', ')}`);
+    /**
+    * 일정 저장
+    * */
+    function save() {
+        console.log("저장 버튼 클릭됨!"); // 1. 버튼 눌리는지 확인용
+
+        if (!selectedDates || selectedDates.length === 0) {
+            alert("선택된 날짜가 없잖아!");
+            return;
+        }
+
+        // 2. 안전하게 ID 가져오기 (문자열로 감싸기)
+        const scheduleId = "[[${calendar.id}]]";
+
+        console.log("보낼 데이터 전처리 시작...");
+
+        const requestData = selectedDates.map(date => ({
+            scheduleId: parseInt(scheduleId),
+            availableDate: date,
+            color: myColor,
+            note: ""
+        }));
+
+        console.log("보낼 데이터:", requestData); // 3. 데이터 모양 확인용
+
+        fetch('/api/availability/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData)
+        })
+            .then(response => {
+                console.log("서버 응답 상태:", response.status);
+                if (response.ok) {
+                    alert("일정이 성공적으로 저장되었습니다! 🎉");
+                    location.reload();
+                } else {
+                    // 서버 에러(403, 500 등)가 나면 여기로 와요
+                    alert("저장에 실패했습니다. (상태코드: " + response.status + ")");
+                }
+            })
+            .catch(error => {
+                console.error('Fetch 에러 발생:', error);
+                alert("서버 통신 중 오류가 발생했습니다.");
+            });
     }
 
     initColorPicker();
