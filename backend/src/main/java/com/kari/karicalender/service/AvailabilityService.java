@@ -4,6 +4,7 @@ import com.kari.karicalender.domain.Availability;
 import com.kari.karicalender.domain.Schedule;
 import com.kari.karicalender.domain.User;
 import com.kari.karicalender.dto.availability.AvailabilityRequestDto;
+import com.kari.karicalender.dto.availability.AvailabilityResponseDto;
 import com.kari.karicalender.repository.AvailabilityRepository;
 import com.kari.karicalender.repository.ScheduleRepository;
 import com.kari.karicalender.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,5 +48,27 @@ public class AvailabilityService {
 
             availabilityRepository.save(availability);
         }
+    }
+
+    /**
+     * 가능한 날짜 조회
+     * @param shareKey
+     * @param userId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public List<AvailabilityResponseDto> getMyAvailability(String shareKey, String userId) {
+        // 1. 유저와 일정 객체 찾기
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Schedule schedule = scheduleRepository.findByShareKey(shareKey)
+                .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다."));
+
+        // 2. 해당 유저가 이 일정에 등록한 날짜들 다 긁어오기
+        return availabilityRepository.findByScheduleAndUser(schedule, user)
+                .stream()
+                .map(AvailabilityResponseDto::new) // Entity -> DTO 변환
+                .collect(Collectors.toList());
     }
 }

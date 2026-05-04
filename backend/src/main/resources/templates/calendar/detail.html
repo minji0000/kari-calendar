@@ -99,6 +99,37 @@
         }
         .color-chip.selected { border-color: #333; transform: scale(1.2); }
         .btn-confirm { background: var(--main-color); color: white; border: none; padding: 15px 30px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(255, 154, 158, 0.3); }
+
+        /* 날짜 칸 안의 동그라미 바구니 */
+        .color-dots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 5px;
+            justify-content: center;
+        }
+
+        /* 실제 동그라미 (컬러칩) */
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* +3 같은 숫자 표시 */
+        .more-count {
+            font-size: 10px;
+            color: #888;
+            font-weight: bold;
+            line-height: 12px;
+        }
+
+        /* 남이 선택한 날짜(동그라미가 있는 칸)는 커서를 금지 모양으로! */
+        .date-cell:has(.dot) {
+            cursor: not-allowed;
+            background-color: #f9f9f9; /* 살짝 어둡게 처리해서 비활성화 느낌 내기 */
+        }
     </style>
 </head>
 <body>
@@ -193,14 +224,29 @@
             const colorClass = dayOfWeek === 0 ? 'sun' : (dayOfWeek === 6 ? 'sat' : '');
 
             grid.innerHTML += `
-                <div class="date-cell ${isToday ? 'today' : ''} ${isSelected}" onclick="toggleDate('${dateStr}', this)">
+                <div class="date-cell ${isToday ? 'today' : ''} ${isSelected}"
+                     data-date="${dateStr}"
+                     onclick="toggleDate('${dateStr}', this)">
                     <div class="date-num ${colorClass}">${d}</div>
+                    <!-- 🌟 동그라미들이 담길 바구니 추가! -->
+                    <div class="color-dots" id="dots-${dateStr}"></div>
                 </div>
             `;
         }
+
+        loadMyAvailability();
     }
 
     function toggleDate(dateStr, element) {
+
+        // 🌟 철벽 방어 로직: 남이 고른 날인지 확인
+        // 해당 칸의 동그라미 바구니에 'dot'이 하나라도 있으면 클릭 금지!
+        const dots = element.querySelectorAll('.dot');
+        if (dots.length > 0) {
+            alert("이미 다른 분들이 일정을 등록한 날짜입니다! 🙅‍♀️");
+            return; // 여기서 함수를 끝내버려서 선택이 안 되게 막음
+        }
+
         const index = selectedDates.indexOf(dateStr);
         if (index > -1) {
             selectedDates.splice(index, 1);
@@ -277,6 +323,69 @@
 
     initColorPicker();
     renderCalendar();
+
+    // 페이지 로딩이 완료되면 실행되는 이벤트 리스너
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("페이지 로딩 완료! 데이터를 불러옵니다...");
+        loadMyAvailability();
+    });
+
+    // 서버에서 데이터를 가져와서 달력에 뿌려주는 함수
+    async function loadMyAvailability() {
+        // 1. URL에서 scheduleId 추출 (예: /schedule/detail/4 -> 4만 쏙!)
+        const pathSegments = window.location.pathname.split('/');
+        const scheduleId = pathSegments[pathSegments.length - 1];
+
+        try {
+            // 2. 서버의 GET API 호출 (우리가 아까 만든 컨트롤러 주소)
+            const response = await fetch(`/api/availability/${scheduleId}`);
+
+            if (response.ok) {
+                const data = await response.json(); // List<AvailabilityResponseDto> 수신
+                console.log("서버에서 받은 데이터:", data);
+
+                // 3. 받은 데이터만큼 반복문 돌리며 색칠하기
+                data.forEach(item => {
+                    // item.availableDate: "2026-04-20"
+                    // item.color: "#F368E0"
+                    applyColorToCalendar(item.availableDate, item.color);
+                });
+            } else {
+                console.error("데이터 로드 실패 (상태 코드):", response.status);
+            }
+        } catch (error) {
+            console.error("네트워크 에러 발생:", error);
+        }
+    }
+
+    // 달력의 특정 날짜 칸을 찾아 색칠하는 도우미 함수
+    function applyColorToCalendar(dateStr, color) {
+        const dotsContainer = document.getElementById(`dots-${dateStr}`);
+
+        if (dotsContainer) {
+            const currentDots = dotsContainer.querySelectorAll('.dot').length;
+            const limit = 3; // 🌟 최대 3개까지만 동그라미로 보여주기
+
+            if (currentDots < limit) {
+                // 동그라미 생성
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.style.backgroundColor = color;
+                dotsContainer.appendChild(dot);
+            } else if (currentDots === limit) {
+                // 4번째부터는 "+1" 이런 식으로 표시
+                const more = document.createElement('span');
+                more.className = 'more-count';
+                more.innerText = '+1';
+                dotsContainer.appendChild(more);
+            } else {
+                // 이미 +가 있으면 숫자만 올리기
+                const more = dotsContainer.querySelector('.more-count');
+                const count = parseInt(more.innerText.replace('+', '')) + 1;
+                more.innerText = `+${count}`;
+            }
+        }
+    }
 </script>
 </body>
 </html>
