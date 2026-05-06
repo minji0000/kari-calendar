@@ -10,8 +10,8 @@ public class AvailabilityResponseDto {
     private LocalDate availableDate;
     private String color;
 
-    public AvailabilityResponseDto(Availability entity) {
+    public AvailabilityResponseDto(Availability entity, String color) {
         this.availableDate = entity.getAvailableDate();
-        this.color = entity.getColor();
+        this.color = color;
     }
 }

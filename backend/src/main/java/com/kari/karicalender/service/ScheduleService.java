@@ -1,8 +1,10 @@
 package com.kari.karicalender.service;
 
+import com.kari.karicalender.domain.Participant;
 import com.kari.karicalender.domain.Schedule;
 import com.kari.karicalender.domain.User;
 import com.kari.karicalender.dto.schedule.ScheduleRequestDto;
+import com.kari.karicalender.repository.ParticipantRepository;
 import com.kari.karicalender.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,15 +18,17 @@ import java.util.UUID;
 @Transactional(readOnly = true) // [기본값] 이 클래스의 모든 메서드는 일단 읽기 전용!
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
+    private final ParticipantRepository participantRepository; // 🌟 추가!
 
     /**
      * 새로운 일정 등록
      */
     @Transactional
-    public String register(ScheduleRequestDto dto, User creator) { // 반환 타입을 String으로!
+    public String register(ScheduleRequestDto dto, User creator) {
 
         String shareKey = UUID.randomUUID().toString();
 
+        // 1. 일정(Schedule) 정보 저장
         Schedule schedule = Schedule.builder()
                 .title(dto.getTitle())
                 .description(dto.getDescription())
@@ -34,7 +38,16 @@ public class ScheduleService {
 
         scheduleRepository.save(schedule);
 
-        return shareKey; // 저장된 일정의 공유키를 반환!
+        // 2. 🌟 방장을 '참여자 명단'에 올리고 선택한 색상 부여
+        Participant participant = Participant.builder()
+                .schedule(schedule)
+                .user(creator)
+                .color(dto.getColor()) // DTO에 담긴 색상
+                .build();
+
+        participantRepository.save(participant);
+
+        return shareKey;
     }
 
     /**
@@ -52,5 +65,10 @@ public class ScheduleService {
     public List<Schedule> findMySchedules(Long userId) {
         // Repository에 findByCreatorId 메서드를 만들어야 해요!
         return scheduleRepository.findByCreatorId(userId);
+    }
+
+    public Participant findParticipant(Schedule schedule, User user) {
+        return participantRepository.findByScheduleAndUser(schedule, user)
+                .orElse(null); // 혹은 예외 처리
     }
 }

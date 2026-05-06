@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class ScheduleRequestDto {
     private String title;       // 일정 이름
     private String description; // 간단한 설명
+    private String color;       // 달력에서 사용할 컬러
 
     // DTO에서 엔티티로 변환하는 메서드
     public Schedule toEntity(User creator, String shareKey) {

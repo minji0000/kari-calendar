@@ -1,11 +1,13 @@
 package com.kari.karicalender.service;
 
 import com.kari.karicalender.domain.Availability;
+import com.kari.karicalender.domain.Participant;
 import com.kari.karicalender.domain.Schedule;
 import com.kari.karicalender.domain.User;
 import com.kari.karicalender.dto.availability.AvailabilityRequestDto;
 import com.kari.karicalender.dto.availability.AvailabilityResponseDto;
 import com.kari.karicalender.repository.AvailabilityRepository;
+import com.kari.karicalender.repository.ParticipantRepository;
 import com.kari.karicalender.repository.ScheduleRepository;
 import com.kari.karicalender.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,27 +24,24 @@ public class AvailabilityService {
     private final AvailabilityRepository availabilityRepository;
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
+    private final ParticipantRepository participantRepository;
 
     @Transactional
     public void saveAll(List<AvailabilityRequestDto> dtoList, String userId) {
-        // 1. 로그인한 유저 정보 가져오기
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
 
-        // 2. 어떤 일정(Schedule)인지 확인 (리스트의 첫 번째 항목 기준)
         if (dtoList.isEmpty()) return;
 
         Long scheduleId = dtoList.get(0).getScheduleId();
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다: " + scheduleId));
 
-        // 3. DTO를 순회하며 Availability 객체 생성 후 저장
         for (AvailabilityRequestDto dto : dtoList) {
             Availability availability = Availability.builder()
                     .schedule(schedule)
                     .user(user)
                     .availableDate(dto.getAvailableDate())
-                    .color(dto.getColor())
                     .note(dto.getNote())
                     .build();
 
@@ -58,17 +57,22 @@ public class AvailabilityService {
      */
     @Transactional(readOnly = true)
     public List<AvailabilityResponseDto> getMyAvailability(String shareKey, String userId) {
-        // 1. 유저와 일정 객체 찾기
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         Schedule schedule = scheduleRepository.findByShareKey(shareKey)
                 .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다."));
 
-        // 2. 해당 유저가 이 일정에 등록한 날짜들 다 긁어오기
+        // 🌟 1. 이 일정에서 이 유저의 색상을 찾아옵니다.
+        Participant participant = participantRepository.findByScheduleAndUser(schedule, user)
+                .orElseThrow(() -> new IllegalArgumentException("참여자 정보를 찾을 수 없습니다."));
+
+        String userColor = participant.getColor();
+
+        // 2. 해당 유저가 등록한 날짜들을 가져와서 DTO로 변환 (색상 주입!)
         return availabilityRepository.findByScheduleAndUser(schedule, user)
                 .stream()
-                .map(AvailabilityResponseDto::new) // Entity -> DTO 변환
+                .map(entity -> new AvailabilityResponseDto(entity, userColor)) // DTO 생성자 수정 필요!
                 .collect(Collectors.toList());
     }
 }

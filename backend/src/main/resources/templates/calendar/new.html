@@ -2,65 +2,111 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Kari Calendar</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>새 일정 만들기 - Kari Calendar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --main-color: #ff9a9e;
+            --bg-color: #fffafb;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Pretendard', sans-serif;
+            margin: 0; padding: 0;
+        }
+
         .form-container {
             max-width: 500px;
             margin: 50px auto;
-            padding: 30px;
+            padding: 40px;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(255, 154, 158, 0.15);
         }
-        h2 { margin-bottom: 25px; color: #333; text-align: center; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+
+        h2 { margin-bottom: 30px; color: #333; text-align: center; font-size: 24px; }
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 10px; font-weight: bold; color: #555; }
+
         input[type="text"], textarea {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box; /* 패딩이 너비를 안 넘치게 */
+            padding: 14px;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            box-sizing: border-box;
+            background-color: #fcfcfc;
+            font-size: 15px;
         }
-        .color-picker { display: flex; gap: 15px; margin-top: 10px; }
+
+        /* 🎨 컬러 피커 스타일 */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
         .color-option {
-            width: 35px;
-            height: 35px;
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%; /* 정사각형 유지 */
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid transparent;
+            border: 3px solid transparent;
             transition: 0.2s;
+            box-sizing: border-box;
         }
-        /* 라디오 버튼은 숨기고 색상 동그라미만 보이게 */
+
         .color-option input { display: none; }
-        .color-option:has(input:checked) { border-color: #333; transform: scale(1.2); }
+
+        /* 체크되었을 때 스타일 */
+        .color-option:has(input:checked) {
+            border-color: #555;
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
 
         .btn-submit {
             width: 100%;
-            padding: 15px;
-            background-color: #ff9a9e;
+            padding: 16px;
+            background-color: var(--main-color);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 15px;
+            font-size: 17px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.3);
+            transition: 0.3s;
+        }
+        .btn-submit:hover { background-color: #ff858a; }
+
+        .btn-cancel {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #aaa;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
 <div class="form-container">
-    <h2><i class="fa-solid fa-calendar-plus"></i> 새 일정 만들기</h2>
+    <h2><i class="fa-solid fa-calendar-plus" style="color: #ff9a9e;"></i> 새 일정 만들기</h2>
 
-    <form action="/schedule/register" method="post">
+    <form th:action="@{/schedule/register}" method="post" id="registerForm">
+        <!-- CSRF 토큰 (Spring Security 사용 시 필요) -->
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
         <div class="form-group">
             <label>일정 제목</label>
-            <input type="text" name="title" placeholder="ex: 클라이밍, 정모, 우리 언제 만날래?" required>
+            <input type="text" name="title" placeholder="ex: 클라이밍 정모, 우리 언제 만날래?" required>
         </div>
 
         <div class="form-group">
@@ -68,10 +114,59 @@
             <textarea name="description" rows="3" placeholder="어떤 일정인지 간단히 적어주세요"></textarea>
         </div>
 
-        <button type="submit" class="btn-submit">생성하기</button>
-        <button type="button" onclick="history.back()" style="width:100%; background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">취소</button>
+        <!-- 🌟 방장의 컬러 선택 섹션 -->
+        <div class="form-group">
+            <label>나의 고유 컬러 <span style="font-weight: normal; font-size: 13px; color: #999;">(달력에 이 색으로 표시돼요!)</span></label>
+            <div class="color-grid" id="colorPicker">
+                <!-- JS에서 팔레트를 생성합니다 -->
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">일정 생성하고 달력으로 가기</button>
+        <button type="button" class="btn-cancel" onclick="history.back()">취소할래요</button>
     </form>
 </div>
+
+<script>
+    const palette = [
+        '#FFB3BA', '#FF007F', '#FF6B6B', '#FF9F43', '#FECA57',
+        '#FFF200', '#1DD1A1', '#009432', '#00D2D3', '#48DBFB',
+        '#2E86DE', '#0652DD', '#1B1464', '#5F27CD', '#833471',
+        '#F368E0', '#D980FA', '#9980FA', '#576574', '#222F3E'
+    ];
+
+    function initColorPicker() {
+        const picker = document.getElementById('colorPicker');
+        palette.forEach((color, idx) => {
+            const label = document.createElement('label');
+            label.className = 'color-option';
+            label.style.backgroundColor = color;
+
+            // 라디오 버튼 생성
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.name = 'color'; // 서버로 전송될 파라미터 이름
+            input.value = color;
+            if (idx === 0) input.checked = true; // 기본값 첫 번째 색상
+
+            label.appendChild(input);
+            picker.appendChild(label);
+        });
+    }
+
+    // 초기화 실행
+    initColorPicker();
+
+    // 폼 제출 전 체크
+    document.getElementById('registerForm').onsubmit = function() {
+        const selectedColor = document.querySelector('input[name="color"]:checked');
+        if (!selectedColor) {
+            alert("나만의 컬러를 하나 골라주세요! 🎨");
+            return false;
+        }
+        return true;
+    };
+</script>
 
 </body>
 </html>

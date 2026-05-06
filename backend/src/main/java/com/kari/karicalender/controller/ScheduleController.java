@@ -1,6 +1,7 @@
 package com.kari.karicalender.controller;
 
 import com.kari.karicalender.config.auth.LoginUser;
+import com.kari.karicalender.domain.Participant;
 import com.kari.karicalender.domain.Schedule;
 import com.kari.karicalender.dto.schedule.ScheduleRequestDto;
 import com.kari.karicalender.service.ScheduleService;
@@ -50,12 +51,17 @@ public class ScheduleController {
      * GET /schedule/detail/{shareKey}
      */
     @GetMapping("/detail/{shareKey}")
-    public String scheduleDetail(@PathVariable String shareKey, Model model) {
-        // 서비스에서 shareKey로 Schedule 정보를 가져옴
+    public String scheduleDetail(@PathVariable String shareKey,
+                                 @AuthenticationPrincipal LoginUser loginUser, // 현재 유저 추가
+                                 Model model) {
         Schedule schedule = scheduleService.findByShareKey(shareKey);
 
-        // detail.html에서 사용할 수 있도록 "calendar"라는 이름으로 모델에 담기
+        // 🌟 현재 로그인한 유저가 이 일정에서 어떤 색인지 찾아 모델에 담기
+        // 참여하지 않았다면 참여하기 페이지로 이동
+        Participant participant = scheduleService.findParticipant(schedule, loginUser.getUser());
+
         model.addAttribute("calendar", schedule);
+        model.addAttribute("myColor", participant != null ? participant.getColor() : null);
 
         return "calendar/detail";
     }

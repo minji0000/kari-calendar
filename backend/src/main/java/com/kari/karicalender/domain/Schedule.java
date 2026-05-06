@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Getter
@@ -19,13 +21,17 @@ public class Schedule extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id")
-    private User creator; // 방장
+    private User creator;
 
     @Column(nullable = false)
-    private String title; // 예: "4월 클라이밍 모임"
+    private String title;
 
     @Column(unique = true, nullable = false)
-    private String shareKey; // 링크용 고유 키 (UUID 등)
+    private String shareKey;
 
-    private String description; // 간단한 모임 설명
+    private String description;
+
+    // 🌟 이 일정에 속한 참여자 명단을 바로 꺼내볼 수 있게 추가 (선택사항)
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
+    private List<Participant> participants = new ArrayList<>();
 }
