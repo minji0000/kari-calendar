@@ -76,33 +76,27 @@
         .selection-detail { display: flex; flex-direction: column; gap: 12px; }
         .info { font-weight: bold; color: #555; }
         #selectCount { color: var(--main-color); }
-        .color-selector {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 8px;
-            margin-top: 10px;
-        }
 
-        @media (max-width: 480px) {
-            .color-selector { grid-template-columns: repeat(5, 1fr); }
+        .my-color-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
         }
-        .color-chip {
-            width: 24px; height: 24px; border-radius: 50%;
-            cursor: pointer; border: 2px solid transparent; transition: 0.2s;
+        .color-preview {
+            width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1);
         }
-        .color-chip.selected { border-color: #333; transform: scale(1.2); }
-        /* 🌟 사용 중인 색상 스타일 */
-        .color-chip.disabled { opacity: 0.2; cursor: not-allowed; filter: grayscale(1); }
 
         .btn-confirm { background: var(--main-color); color: white; border: none; padding: 15px 30px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(255, 154, 158, 0.3); }
 
-        /* 🌟 동그라미 바구니 왼쪽 정렬 */
         .color-dots {
             display: flex;
             flex-wrap: wrap;
             gap: 4px;
             margin-top: 5px;
-            justify-content: flex-start; /* 왼쪽 정렬 */
+            justify-content: flex-start;
             min-height: 12px;
         }
 
@@ -119,18 +113,36 @@
             font-weight: bold;
             line-height: 12px;
         }
+
+        .my-color-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .color-preview {
+            width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
 
+<!-- CSRF 토큰을 위한 히든 필드 (Spring Security 사용 시 필수) -->
+<input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
 <div class="detail-container">
     <section class="header-section">
-        <h1 th:text="${calendar.title}">테스트용 우리 가족 달력 👨‍👩‍👧</h1>
+        <h1 th:text="${calendar.title}">테스트용 우리 가족 달력</h1>
         <p class="description" th:text="${calendar.description}">설명이 들어가는 자리입니다.</p>
     </section>
 
     <section class="share-card">
-        <div class="share-info"><span>초대 코드</span> <span class="share-key" id="shareKey" th:text="${calendar.shareKey}">KARI-TEST</span></div>
+        <div class="share-info">
+            <span>초대 코드</span>
+            <span class="share-key" id="shareKey" th:text="${calendar.shareKey}">KARI-TEST</span>
+        </div>
         <button class="copy-btn" onclick="copyKey()"><i class="fa-regular fa-copy"></i> 코드 복사</button>
     </section>
 
@@ -145,45 +157,33 @@
 
 <div class="floating-bar" id="floatingBar">
     <div class="selection-detail">
+        <div class="my-color-info">
+            <div class="color-preview" id="myColorPreview"></div>
+            <span>내 컬러로 선택 중</span>
+        </div>
         <div class="info"><span id="selectCount">0</span>일 선택됨</div>
-        <div class="color-selector" id="colorPicker"></div>
+        <!-- 🌟 색상 선택기는 이제 방장/참여자 모두 고정된 색을 쓰므로 숨기거나 제거합니다 -->
+        <div class="color-selector" id="colorPicker" style="display: none;"></div>
     </div>
-    <button class="btn-confirm" onclick="save()">일정 등록하기</button>
+    <button class="btn-confirm" id="confirmBtn" onclick="save()">일정 등록하기</button>
 </div>
 
-<script>
+<script th:inline="javascript">
+    /* 🌟 서버에서 넘겨준 데이터 안전하게 받기 */
+    const myColor = /*[[${myColor}]]*/ '#FFB3BA';
+    const shareKey = /*[[${calendar.shareKey}]]*/ '';
+    const scheduleId = /*[[${calendar.id}]]*/ 0;
+
     let currentNavDate = new Date();
     let selectedDates = [];
-    let myColor = '#FFB3BA';
-    const palette = [
-        '#FFB3BA', '#FF007F', '#FF6B6B', '#FF9F43', '#FECA57',
-        '#FFF200', '#1DD1A1', '#009432', '#00D2D3', '#48DBFB',
-        '#2E86DE', '#0652DD', '#1B1464', '#5F27CD', '#833471',
-        '#F368E0', '#D980FA', '#9980FA', '#576574', '#222F3E'
-    ];
 
-    function initColorPicker() {
-        const picker = document.getElementById('colorPicker');
-        picker.innerHTML = ''; // 초기화
-        palette.forEach((color, idx) => {
-            const chip = document.createElement('div');
-            chip.className = `color-chip ${color === myColor ? 'selected' : ''}`;
-            chip.style.background = color;
-            chip.dataset.color = color;
-            chip.onclick = () => selectMyColor(color, chip);
-            picker.appendChild(chip);
-        });
-    }
+    // 초기 설정
+    function init() {
+        // 내 컬러 미리보기 세팅
+        document.getElementById('myColorPreview').style.backgroundColor = myColor;
+        document.getElementById('confirmBtn').style.backgroundColor = myColor;
 
-    function selectMyColor(color, element) {
-        if (element.classList.contains('disabled')) {
-            alert("이 색상은 다른 분이 이미 선점하셨어요! 🎨");
-            return;
-        }
-        myColor = color;
-        document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected'));
-        element.classList.add('selected');
-        document.querySelector('.btn-confirm').style.backgroundColor = color;
+        renderCalendar();
     }
 
     function renderCalendar() {
@@ -222,7 +222,8 @@
                 </div>
             `;
         }
-        loadMyAvailability();
+        // 달력 그릴 때마다 기존 데이터 불러오기
+        loadAllAvailability();
     }
 
     function toggleDate(dateStr, element) {
@@ -252,23 +253,24 @@
         navigator.clipboard.writeText(key).then(() => alert('코드가 복사되었습니다! 🌸'));
     }
 
+    /* 🌟 저장 로직 수정 (DTO 구조에 맞게) */
     function save() {
-        if (!selectedDates || selectedDates.length === 0) {
-            alert("선택된 날짜가 없잖아!");
-            return;
-        }
+        if (selectedDates.length === 0) return;
 
-        const scheduleId = "[[${calendar.id}]]";
+        const csrfToken = document.getElementById('csrfToken').value;
         const requestData = selectedDates.map(date => ({
-            scheduleId: parseInt(scheduleId),
+            scheduleId: scheduleId,
             availableDate: date,
-            color: myColor,
+            // color는 더 이상 보내지 않음 (백엔드 Participant 테이블 참조)
             note: ""
         }));
 
         fetch('/api/availability/save', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken // Security 대응
+            },
             body: JSON.stringify(requestData)
         })
             .then(response => {
@@ -281,38 +283,15 @@
             });
     }
 
-    initColorPicker();
-    renderCalendar();
-
-    async function loadMyAvailability() {
-        const pathSegments = window.location.pathname.split('/');
-        const scheduleId = pathSegments[pathSegments.length - 1];
-
+    /* 🌟 조회 로직 수정 (shareKey 사용 및 전체 조회) */
+    async function loadAllAvailability() {
         try {
-            const response = await fetch(`/api/availability/${scheduleId}`);
+            const response = await fetch(`/api/availability/${shareKey}`);
             if (response.ok) {
                 const data = await response.json();
 
-                // 🌟 사용 중인 컬러 목록 추출
-                const usedColors = data.map(item => item.color.toUpperCase());
-
-                // 🌟 컬러 피커 업데이트 (남이 쓰는 색 막기)
-                document.querySelectorAll('.color-chip').forEach(chip => {
-                    const chipColor = chip.dataset.color.toUpperCase();
-                    if (usedColors.includes(chipColor)) {
-                        chip.classList.add('disabled');
-                        // 만약 내 기본색이 이미 남이 쓰는 색이라면, 다음 사용 가능한 색으로 자동 변경
-                        if (myColor.toUpperCase() === chipColor) {
-                            const nextColor = palette.find(p => !usedColors.includes(p.toUpperCase()));
-                            if(nextColor) {
-                                myColor = nextColor;
-                                document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected'));
-                                // 이 시점엔 아직 다음 칩이 생성 전일 수 있으므로 렌더링 후 처리가 안전하지만
-                                // 로직 흐름상 다시 init하거나 강조 표시 로직 재실행
-                            }
-                        }
-                    }
-                });
+                // 기존 점들 초기화 (중복 방지)
+                document.querySelectorAll('.color-dots').forEach(el => el.innerHTML = '');
 
                 data.forEach(item => {
                     applyColorToCalendar(item.availableDate, item.color);
@@ -325,14 +304,12 @@
         const dotsContainer = document.getElementById(`dots-${dateStr}`);
         if (dotsContainer) {
             const currentDots = dotsContainer.querySelectorAll('.dot').length;
-            const limit = 3;
-
-            if (currentDots < limit) {
+            if (currentDots < 3) {
                 const dot = document.createElement('div');
                 dot.className = 'dot';
                 dot.style.backgroundColor = color;
                 dotsContainer.appendChild(dot);
-            } else if (currentDots === limit) {
+            } else if (currentDots === 3) {
                 const more = document.createElement('span');
                 more.className = 'more-count';
                 more.innerText = '+1';
@@ -344,6 +321,9 @@
             }
         }
     }
+
+    // 실행
+    init();
 </script>
 </body>
 </html>

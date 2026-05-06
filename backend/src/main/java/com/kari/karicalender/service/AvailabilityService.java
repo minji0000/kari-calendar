@@ -63,16 +63,16 @@ public class AvailabilityService {
         Schedule schedule = scheduleRepository.findByShareKey(shareKey)
                 .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다."));
 
-        // 🌟 1. 이 일정에서 이 유저의 색상을 찾아옵니다.
+        // 🌟 이 일정에서 이 유저의 색상을 찾아옵니다.
         Participant participant = participantRepository.findByScheduleAndUser(schedule, user)
                 .orElseThrow(() -> new IllegalArgumentException("참여자 정보를 찾을 수 없습니다."));
 
         String userColor = participant.getColor();
 
-        // 2. 해당 유저가 등록한 날짜들을 가져와서 DTO로 변환 (색상 주입!)
+        // 해당 유저의 날짜들을 가져와서 '그 유저의 색상'을 입혀서 반환합니다.
         return availabilityRepository.findByScheduleAndUser(schedule, user)
                 .stream()
-                .map(entity -> new AvailabilityResponseDto(entity, userColor)) // DTO 생성자 수정 필요!
+                .map(entity -> new AvailabilityResponseDto(entity, userColor))
                 .collect(Collectors.toList());
     }
 }

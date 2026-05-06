@@ -61,7 +61,7 @@ public class ScheduleController {
         Participant participant = scheduleService.findParticipant(schedule, loginUser.getUser());
 
         model.addAttribute("calendar", schedule);
-        model.addAttribute("myColor", participant != null ? participant.getColor() : null);
+        model.addAttribute("myColor", participant != null ? participant.getColor() : "#FFB3BA");
 
         return "calendar/detail";
     }

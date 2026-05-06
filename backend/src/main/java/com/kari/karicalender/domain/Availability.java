@@ -30,8 +30,5 @@ public class Availability extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDate availableDate;
 
-    // 🌟 color 필드를 삭제했습니다.
-    // 이제 색상은 Participant 테이블에서 관리합니다.
-
     private String note;
 }
