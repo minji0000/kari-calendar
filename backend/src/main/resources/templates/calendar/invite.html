@@ -1,0 +1,44 @@
+<div class="invite-card">
+    <div class="icon">💌</div>
+    <h1 th:text="${calendar.title}">일정 제목</h1>
+    <p th:text="${calendar.description}">설명</p>
+
+    <!-- 색상 선택 영역 -->
+    <div class="color-picker-container">
+        <p style="font-size: 14px; color: #666;">달력에 표시될 내 컬러를 골라주세요!</p>
+        <div class="color-options">
+            <div class="color-dot selected" style="background: #FFB3BA" onclick="selectColor(this, '#FFB3BA')"></div>
+            <div class="color-dot" style="background: #BAFFC9" onclick="selectColor(this, '#BAFFC9')"></div>
+            <div class="color-dot" style="background: #BAE1FF" onclick="selectColor(this, '#BAE1FF')"></div>
+            <div class="color-dot" style="background: #FFFFBA" onclick="selectColor(this, '#FFFFBA')"></div>
+            <div class="color-dot" style="background: #D4A5FF" onclick="selectColor(this, '#D4A5FF')"></div>
+        </div>
+    </div>
+
+    <form id="joinForm" th:action="@{/schedule/join/{key}(key=${calendar.shareKey})}" method="POST">
+        <!-- CSRF 토큰 (Security 사용 시 필수!) -->
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+        <input type="hidden" name="color" id="selectedColor" value="#FFB3BA">
+        <button type="submit" class="btn-join">이 색상으로 참여하기</button>
+    </form>
+</div>
+
+<style>
+    .color-options { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+    .color-dot {
+        width: 35px; height: 35px; border-radius: 50%; cursor: pointer;
+        transition: 0.2s; border: 3px solid transparent;
+    }
+    .color-dot.selected { border-color: #888; transform: scale(1.2); }
+</style>
+
+<script>
+    function selectColor(el, color) {
+        // 기존 선택 해제
+        document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('selected'));
+        // 새 선택 적용
+        el.classList.add('selected');
+        document.getElementById('selectedColor').value = color;
+    }
+</script>

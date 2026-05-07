@@ -60,8 +60,13 @@ public class ScheduleController {
         // 참여하지 않았다면 참여하기 페이지로 이동
         Participant participant = scheduleService.findParticipant(schedule, loginUser.getUser());
 
+        // 🌟 만약 참여자가 아니라면? 참여하기(초대) 페이지로 쫓아내기!
+        if (participant == null) {
+            return "redirect:/schedule/invite/" + shareKey;
+        }
+
         model.addAttribute("calendar", schedule);
-        model.addAttribute("myColor", participant != null ? participant.getColor() : "#FFB3BA");
+        model.addAttribute("myColor", participant.getColor());
 
         return "calendar/detail";
     }
@@ -98,4 +103,37 @@ public class ScheduleController {
 
         return "calendar/main";
     }
+
+    /**
+     * 🌟 새롭게 추가: 초대(참여 가입) 화면 조회
+     * GET /schedule/invite/{shareKey}
+     */
+    @GetMapping("/invite/{shareKey}")
+    public String invitePage(@PathVariable String shareKey,
+                             @AuthenticationPrincipal LoginUser loginUser,
+                             Model model) {
+
+        // [로직 2-1] 로그인이 안 되어있으면 Security가 자동으로 /login으로 보낼 거예요.
+        // 만약 수동으로 제어하고 싶다면 (if loginUser == null) 로직을 넣을 수 있습니다.
+
+        Schedule schedule = scheduleService.findByShareKey(shareKey);
+
+        // [로직 1-1 & 1-2] 혹시 이미 참여자인데 이 주소로 들어왔다면? 바로 상세페이지로!
+        if (scheduleService.isParticipant(schedule, loginUser.getUser())) {
+            return "redirect:/schedule/detail/" + shareKey;
+        }
+
+        // [로직 1-3] 참여자가 아니면 색상 선택하는 초대 페이지(invite.html) 보여주기
+        model.addAttribute("calendar", schedule);
+        return "calendar/invite";
+    }
+
+    @PostMapping("/join/{shareKey}")
+    public String joinSchedule(@PathVariable String shareKey,
+                               @RequestParam String color,  // 🌟 사용자가 고른 색상
+                               @AuthenticationPrincipal LoginUser loginUser) {
+        scheduleService.joinSchedule(shareKey, loginUser.getUser(), color);
+        return "redirect:/schedule/detail/" + shareKey;
+    }
+
 }

@@ -71,4 +71,25 @@ public class ScheduleService {
         return participantRepository.findByScheduleAndUser(schedule, user)
                 .orElse(null); // 혹은 예외 처리
     }
+
+    @Transactional
+    public void joinSchedule(String shareKey, User user, String selectedColor) {
+        Schedule schedule = findByShareKey(shareKey);
+
+        if (isParticipant(schedule, user)) return;
+
+        Participant participant = Participant.builder()
+                .schedule(schedule)
+                .user(user)
+                .color(selectedColor) // 🌟 사용자가 직접 고른 색상 저장!
+                .build();
+
+        participantRepository.save(participant);
+    }
+
+    // 특정 사용자가 해당 일정에 이미 참여 중인지 확인하는 함수
+    public boolean isParticipant(Schedule schedule, User user) {
+        // ParticipantRepository에서 일정과 유저 정보로 데이터가 있는지 조회합니다.
+        return participantRepository.existsByScheduleAndUser(schedule, user);
+    }
 }

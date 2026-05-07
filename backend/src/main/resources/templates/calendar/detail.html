@@ -250,7 +250,12 @@
 
     function copyKey() {
         const key = document.getElementById('shareKey').innerText;
-        navigator.clipboard.writeText(key).then(() => alert('코드가 복사되었습니다! 🌸'));
+        // 현재 접속 중인 주소(도메인)를 자동으로 가져와서 초대 링크를 만듭니다.
+        const inviteLink = `${window.location.origin}/invite/${key}`;
+
+        navigator.clipboard.writeText(inviteLink).then(() => {
+            alert('초대 링크가 복사되었습니다! 친구에게 공유해보세요. 🌸');
+        });
     }
 
     /* 🌟 저장 로직 수정 (DTO 구조에 맞게) */
