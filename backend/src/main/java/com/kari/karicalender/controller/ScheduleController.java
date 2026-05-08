@@ -104,28 +104,6 @@ public class ScheduleController {
         return "calendar/main";
     }
 
-    /**
-     * 🌟 새롭게 추가: 초대(참여 가입) 화면 조회
-     * GET /schedule/invite/{shareKey}
-     */
-    @GetMapping("/invite/{shareKey}")
-    public String invitePage(@PathVariable String shareKey,
-                             @AuthenticationPrincipal LoginUser loginUser,
-                             Model model) {
-
-        Schedule schedule = scheduleService.findByShareKey(shareKey);
-
-        if (scheduleService.isParticipant(schedule, loginUser.getUser())) {
-            return "redirect:/schedule/detail/" + shareKey;
-        }
-
-        List<String> occupiedColors = scheduleService.getOccupiedColors(schedule);
-
-        model.addAttribute("calendar", schedule);
-        model.addAttribute("occupiedColors", occupiedColors);
-        return "calendar/invite";
-    }
-
     @PostMapping("/join/{shareKey}")
     public String joinSchedule(@PathVariable String shareKey,
                                @RequestParam String color,  // 🌟 사용자가 고른 색상
