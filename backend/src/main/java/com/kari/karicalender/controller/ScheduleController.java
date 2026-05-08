@@ -72,22 +72,6 @@ public class ScheduleController {
     }
 
     /**
-     * [테스트용] 일정 상세 화면 더미 데이터 조회
-     */
-    @GetMapping("/detail-test")
-    public String scheduleDetailTest(Model model) {
-        // 테스트를 위한 임시 객체 (나중에 삭제해도 됨!)
-        Schedule dummy = Schedule.builder()
-                .title("테스트용 우리 가족 달력 👨‍👩‍👧")
-                .description("가족 모임 일정을 관리하는 달력입니다.")
-                .shareKey("KARI-1234-TEST")
-                .build();
-
-        model.addAttribute("calendar", dummy);
-        return "calendar/detail";
-    }
-
-    /**
      * 로그인한 유저의 일정 가져옴
      */
     @GetMapping("/main")
