@@ -29,9 +29,9 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/api/**")
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // 2. API 경로에 대한 권한 설정 (로그인한 사용자만 가능)
-                        .requestMatchers("/api/availability/**").authenticated()
                         .requestMatchers("/", "/login", "/join", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/schedule/invite/**").authenticated()
+                        .requestMatchers("/api/availability/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login")
                         .usernameParameter("userId")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/schedule/main", true)
+                        .defaultSuccessUrl("/schedule/main", false)
                         .permitAll()
                 )
                 .userDetailsService(loginUserService);

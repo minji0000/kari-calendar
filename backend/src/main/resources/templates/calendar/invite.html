@@ -1,44 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>초대합니다! - Kari Calendar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --main-color: #ff9a9e;
+            --bg-color: #fffafb;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Pretendard', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .invite-card {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(255, 154, 158, 0.15);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+        }
+
+        .icon { font-size: 50px; margin-bottom: 20px; }
+        h1 { font-size: 24px; color: #333; margin: 0 0 10px 0; }
+        .description { color: #888; font-size: 16px; margin-bottom: 30px; }
+
+        .form-group { text-align: left; margin-bottom: 25px; }
+        label { display: block; margin-bottom: 15px; font-weight: bold; color: #555; }
+
+        /* 🎨 컬러 피커 스타일 (new.html과 동일) */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        .color-option {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: 0.2s;
+            box-sizing: border-box;
+        }
+
+        .color-option input { display: none; }
+
+        /* 선택되었을 때 스타일 */
+        .color-option:has(input:checked) {
+            border-color: #555;
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* ❌ 이미 선택된 컬러 스타일 (비활성화) */
+        .color-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.3;
+        }
+        .color-option.disabled::after {
+            content: '✕';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn-join {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--main-color);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.3);
+            transition: 0.3s;
+        }
+        .btn-join:hover { background-color: #ff858a; }
+    </style>
+</head>
+<body>
+
 <div class="invite-card">
     <div class="icon">💌</div>
     <h1 th:text="${calendar.title}">일정 제목</h1>
-    <p th:text="${calendar.description}">설명</p>
-
-    <!-- 색상 선택 영역 -->
-    <div class="color-picker-container">
-        <p style="font-size: 14px; color: #666;">달력에 표시될 내 컬러를 골라주세요!</p>
-        <div class="color-options">
-            <div class="color-dot selected" style="background: #FFB3BA" onclick="selectColor(this, '#FFB3BA')"></div>
-            <div class="color-dot" style="background: #BAFFC9" onclick="selectColor(this, '#BAFFC9')"></div>
-            <div class="color-dot" style="background: #BAE1FF" onclick="selectColor(this, '#BAE1FF')"></div>
-            <div class="color-dot" style="background: #FFFFBA" onclick="selectColor(this, '#FFFFBA')"></div>
-            <div class="color-dot" style="background: #D4A5FF" onclick="selectColor(this, '#D4A5FF')"></div>
-        </div>
-    </div>
+    <p class="description" th:text="${calendar.description}">일정 설명이 들어가는 자리입니다.</p>
 
     <form id="joinForm" th:action="@{/schedule/join/{key}(key=${calendar.shareKey})}" method="POST">
-        <!-- CSRF 토큰 (Security 사용 시 필수!) -->
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-        <input type="hidden" name="color" id="selectedColor" value="#FFB3BA">
+        <input type="hidden" name="color" id="selectedColor">
+
+        <div class="form-group">
+            <label>나의 고유 컬러 <span style="font-weight: normal; font-size: 13px; color: #999;">(이미 사용 중인 색상은 선택 불가)</span></label>
+            <div class="color-grid" id="colorPicker">
+            </div>
+        </div>
+
         <button type="submit" class="btn-join">이 색상으로 참여하기</button>
     </form>
 </div>
 
-<style>
-    .color-options { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
-    .color-dot {
-        width: 35px; height: 35px; border-radius: 50%; cursor: pointer;
-        transition: 0.2s; border: 3px solid transparent;
-    }
-    .color-dot.selected { border-color: #888; transform: scale(1.2); }
-</style>
+<script th:inline="javascript">
+    // 서버에서 넘겨준 이미 선택된 색상 리스트 (컨트롤러에서 보내줘야 함)
+    const occupiedColors = /*[[${occupiedColors}]]*/ [];
 
-<script>
-    function selectColor(el, color) {
-        // 기존 선택 해제
-        document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('selected'));
-        // 새 선택 적용
-        el.classList.add('selected');
-        document.getElementById('selectedColor').value = color;
+    const palette = [
+        '#FFB3BA', '#FF007F', '#FF6B6B', '#FF9F43', '#FECA57',
+        '#FFF200', '#1DD1A1', '#009432', '#00D2D3', '#48DBFB',
+        '#2E86DE', '#0652DD', '#1B1464', '#5F27CD', '#833471',
+        '#F368E0', '#D980FA', '#9980FA', '#576574', '#222F3E'
+    ];
+
+    function initColorPicker() {
+        const picker = document.getElementById('colorPicker');
+        let firstAvailableSet = false;
+
+        palette.forEach((color) => {
+            const label = document.createElement('label');
+            label.className = 'color-option';
+            label.style.backgroundColor = color;
+
+            // 이미 사용 중인 색상인지 확인
+            const isOccupied = occupiedColors && occupiedColors.includes(color);
+
+            if (isOccupied) {
+                label.classList.add('disabled');
+            } else {
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'color_radio'; // hidden 필드와 이름 안 겹치게 설정
+                input.value = color;
+
+                // 첫 번째 사용 가능한 색상을 기본값으로 선택
+                if (!firstAvailableSet) {
+                    input.checked = true;
+                    document.getElementById('selectedColor').value = color;
+                    firstAvailableSet = true;
+                }
+
+                input.onclick = () => {
+                    document.getElementById('selectedColor').value = color;
+                };
+                label.appendChild(input);
+            }
+            picker.appendChild(label);
+        });
     }
+
+    initColorPicker();
+
+    // 폼 제출 전 체크
+    document.getElementById('joinForm').onsubmit = function() {
+        if (!document.getElementById('selectedColor').value) {
+            alert("나만의 컬러를 하나 골라주세요! 🎨");
+            return false;
+        }
+        return true;
+    };
 </script>
+
+</body>
+</html>

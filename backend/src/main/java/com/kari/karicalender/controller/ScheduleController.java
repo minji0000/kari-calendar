@@ -113,18 +113,16 @@ public class ScheduleController {
                              @AuthenticationPrincipal LoginUser loginUser,
                              Model model) {
 
-        // [로직 2-1] 로그인이 안 되어있으면 Security가 자동으로 /login으로 보낼 거예요.
-        // 만약 수동으로 제어하고 싶다면 (if loginUser == null) 로직을 넣을 수 있습니다.
-
         Schedule schedule = scheduleService.findByShareKey(shareKey);
 
-        // [로직 1-1 & 1-2] 혹시 이미 참여자인데 이 주소로 들어왔다면? 바로 상세페이지로!
         if (scheduleService.isParticipant(schedule, loginUser.getUser())) {
             return "redirect:/schedule/detail/" + shareKey;
         }
 
-        // [로직 1-3] 참여자가 아니면 색상 선택하는 초대 페이지(invite.html) 보여주기
+        List<String> occupiedColors = scheduleService.getOccupiedColors(schedule);
+
         model.addAttribute("calendar", schedule);
+        model.addAttribute("occupiedColors", occupiedColors);
         return "calendar/invite";
     }
 

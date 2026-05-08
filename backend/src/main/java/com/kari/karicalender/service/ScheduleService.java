@@ -92,4 +92,8 @@ public class ScheduleService {
         // ParticipantRepository에서 일정과 유저 정보로 데이터가 있는지 조회합니다.
         return participantRepository.existsByScheduleAndUser(schedule, user);
     }
+
+    public List<String> getOccupiedColors(Schedule schedule) {
+        return participantRepository.findColorsByScheduleId(schedule.getId());
+    }
 }

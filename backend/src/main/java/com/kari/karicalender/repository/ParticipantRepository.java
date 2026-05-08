@@ -4,6 +4,8 @@ import com.kari.karicalender.domain.Participant;
 import com.kari.karicalender.domain.Schedule;
 import com.kari.karicalender.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,4 +29,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     // 일정과 유저로 데이터 존재 여부 확인
     boolean existsByScheduleAndUser(Schedule schedule, User user);
+
+    @Query("SELECT p.color FROM Participant p WHERE p.schedule.id = :scheduleId")
+    List<String> findColorsByScheduleId(@Param("scheduleId") Long scheduleId);
 }
