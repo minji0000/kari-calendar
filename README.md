@@ -5,12 +5,12 @@
 
 ## 🛠 Tech Stack
 
-| Category | Technology | Detail |
-| :--- | :--- | :--- |
-| **Backend** | Spring Boot 3.x | Java 17, Spring Security |
-| **Database** | Oracle | JPA / Hibernate |
-| **Frontend** | Thymeleaf | HTML5, CSS3, JavaScript |
-| **Build Tool** | Gradle | Dependency Management |
+| Category | Technology        | Detail |
+| :--- |:------------------| :--- |
+| **Backend** | Spring Boot 4.0.5 | Java 17, Spring Security |
+| **Database** | MySQL                  | JPA / Hibernate |
+| **Frontend** | Thymeleaf         | HTML5, CSS3, JavaScript |
+| **Build Tool** | Gradle 8.x        | Dependency Management |
 
 ---
 
