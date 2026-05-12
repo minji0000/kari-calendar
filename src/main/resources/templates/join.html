@@ -4,21 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입 - Kari Cal</title>
-    <style>
-        body { font-family: 'Pretendard', sans-serif; background-color: #fffafb; padding: 20px; display: flex; justify-content: center; }
-        .join-container { width: 100%; max-width: 450px; background: white; padding: 2.5rem; border-radius: 25px; box-shadow: 0 10px 30px rgba(255, 154, 158, 0.1); }
-        h2 { color: #ff9a9e; text-align: center; margin-bottom: 2rem; }
-        .section-title { font-size: 0.9rem; color: #ff9a9e; font-weight: bold; margin: 1.5rem 0 0.5rem; border-bottom: 1px solid #ffebee; padding-bottom: 5px; }
-        .input-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.4rem; color: #666; font-size: 0.85rem; font-weight: 600; }
-        input, select { width: 100%; padding: 0.9rem; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 1rem; background-color: #fcfcfc; }
-        input:focus { outline: none; border-color: #ff9a9e; background-color: white; }
-        .btn-submit { width: 100%; padding: 1.1rem; border: none; border-radius: 12px; background-color: #ff9a9e; color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 2rem; }
-        .btn-submit:disabled { background-color: #ccc; cursor: not-allowed; }
-        .error-msg { color: #ff4d4d; font-size: 0.85rem; text-align: center; margin-top: 10px; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body>
+<body class="flex-center-page">
 <div class="join-container">
     <h2>회원가입 🌸</h2>
     <form th:action="@{/join}" method="post">

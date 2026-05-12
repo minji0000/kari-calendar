@@ -40,12 +40,7 @@ public class InviteController {
             return "redirect:/schedule/detail/" + shareKey;
         }
 
-        // 🌟 [추가] 이미 선택된 색상들을 가져와서 모델에 담아줘야 합니다!
         List<String> occupiedColors = scheduleService.getOccupiedColors(schedule);
-
-        // 로그 찍어서 확인 (이제 콘솔에 잘 찍힐 거예요!)
-        System.out.println("초대 페이지 진입 - 일정 ID: " + schedule.getId());
-        System.out.println("이미 선택된 색상들: " + occupiedColors);
 
         model.addAttribute("calendar", schedule);
         model.addAttribute("occupiedColors", occupiedColors); // 👈 핵심!
