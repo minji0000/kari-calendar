@@ -1,0 +1,35 @@
+/* main.html 전용 스타일 */
+.main-container {
+    max-width: 600px;
+    margin: 0 auto;    /* 👈 이게 핵심! 왼쪽 쏠림을 해결하고 중앙으로 모아줍니다 */
+    padding: 50px 20px; /* 위아래 여백 */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.calendar-list {
+    display: grid;
+    gap: 20px;
+    width: 100%;
+}
+
+.calendar-card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(255, 154, 158, 0.1);
+    cursor: pointer;
+    text-align: left;
+    border: 1px solid transparent;
+    transition: 0.2s;
+}
+
+.calendar-card:hover {
+    transform: translateY(-5px);
+    border-color: #ff9a9e;
+}
