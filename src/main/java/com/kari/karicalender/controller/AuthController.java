@@ -53,4 +53,9 @@ public class AuthController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/profile")
+    public String profilePage() {
+        return "profile";
+    }
 }
