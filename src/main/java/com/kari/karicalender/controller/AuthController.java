@@ -1,10 +1,12 @@
 package com.kari.karicalender.controller;
 
+import com.kari.karicalender.config.auth.LoginUser;
 import com.kari.karicalender.domain.User;
 import com.kari.karicalender.dto.user.UserDto;
 import com.kari.karicalender.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -55,7 +57,14 @@ public class AuthController {
     }
 
     @GetMapping("/profile")
-    public String profilePage() {
-        return "profile";
+    public String profilePage(Model model, @AuthenticationPrincipal LoginUser loginUser) {
+
+        // 1. 현재 로그인한 유저 정보가 잘 있는지 안전하게 체크
+        if (loginUser != null) {
+            // 2. 민지님이 커스텀한 LoginUser에서 실제 User 도메인 객체를 꺼내 Model에 담아줍니다.
+            model.addAttribute("user", loginUser.getUser());
+        }
+
+        return "profile"; // templates/profile.html을 띄웁니다.
     }
 }

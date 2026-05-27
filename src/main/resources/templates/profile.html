@@ -7,18 +7,27 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body class="flex-center-page"> <div class="login-container" style="text-align: center;"> <h2 style="color: var(--main-color); margin-bottom: 25px;">내 프로필 🌸</h2>
+<body class="flex-center-page">
+
+<div class="login-container" style="text-align: center;">
+    <h2 style="color: var(--main-color); margin-bottom: 25px;">내 프로필 🌸</h2>
 
     <div style="font-size: 3.5rem; color: var(--main-color); background: #fff0f1; width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 4px 15px rgba(255, 154, 158, 0.15);">
         <i class="fa-solid fa-user"></i>
     </div>
 
     <div style="margin-bottom: 35px; text-align: left; padding: 0 10px;">
-        <p style="margin: 10px 0;"><strong style="color: #666;">닉네임 :</strong> <span style="color: #333; margin-left: 10px;">카리 개발자 ✨</span></p>
-        <p style="margin: 10px 0;"><strong style="color: #666;">이메일 :</strong> <span style="color: #333; margin-left: 10px;">kari@example.com</span></p>
+        <p style="margin: 10px 0;">
+            <strong style="color: #666;">닉네임 :</strong>
+            <span style="color: #333; margin-left: 10px;" th:text="${user.nickname}">카리 개발자 ✨</span>
+        </p>
+        <p style="margin: 10px 0;">
+            <strong style="color: #666;">이메일 :</strong>
+            <span style="color: #333; margin-left: 10px;" th:text="${user.email}">kari@example.com</span>
+        </p>
     </div>
 
-    <a href="/schedule/main" class="btn btn-login" style="display: block; text-decoration: none;">메인으로 돌아가기</a>
+    <a th:href="@{/schedule/main}" class="btn btn-login" style="display: block; text-decoration: none;">메인으로 돌아가기</a>
 </div>
 
 </body>

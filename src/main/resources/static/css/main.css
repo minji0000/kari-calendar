@@ -33,3 +33,25 @@
     transform: translateY(-5px);
     border-color: #ff9a9e;
 }
+
+.profile-btn {
+    background: #fff0f1;      /* 연한 핑크빛 배경 */
+    border: none;
+    color: var(--main-color);  /* 메인 핑크색 */
+    font-size: 1.4rem;         /* 아이콘 크기 살짝 키우기 */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;        /* 완벽한 동그라미 */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(255, 154, 158, 0.15); /* 은은한 핑크 그림자 */
+}
+
+.profile-btn:hover {
+    transform: scale(1.1);     /* 마우스 올리면 살짝 커지는 효과 */
+    background: var(--main-color);
+    color: white;              /* 반전 효과 */
+}
