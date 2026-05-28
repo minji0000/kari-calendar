@@ -24,17 +24,14 @@
     <header class="header">
         <h1>나의 일정 🌸</h1>
         <button class="profile-btn" onclick="goToProfile()">
-            <i class="fa-regular fa-user-circle"></i> </button>
+            <i class="fa-regular fa-user-circle"></i>
         </button>
     </header>
 
-    <!-- 1. 내가 만든 달력 섹션 -->
     <div class="section-title">
         <i class="fa-solid fa-crown"></i> 내가 만든 일정
     </div>
-    <!-- 내가 만든 달력 섹션 반복문 -->
     <div class="calendar-list">
-        <!-- th:each를 사용해서 DB에서 가져온 개수만큼 카드를 생성해요! -->
         <div class="calendar-card"
              th:each="cal : ${ownerCalendars}"
              th:data-sharekey="${cal.shareKey}"
@@ -48,27 +45,33 @@
             </p>
         </div>
 
-        <!-- 만약 데이터가 하나도 없다면? -->
         <div th:if="${#lists.isEmpty(ownerCalendars)}" class="empty-state">
             아직 생성한 달력이 없어요. 우측 하단 + 버튼을 눌러보세요! ✨
         </div>
     </div>
 
-    <!-- 2. 공유받은 달력 섹션 -->
     <div class="section-title">
         <i class="fa-solid fa-handshake-angle"></i> 공유받은 일정
     </div>
     <div class="calendar-list">
-        <!-- 클릭 시 경로 수정: /schedule/detail/{shareKey} -->
-        <div class="calendar-card" onclick="location.href='/schedule/detail/KARI-SHARE-KEY'">
+        <div class="calendar-card"
+             th:each="cal : ${memberCalendars}"
+             th:data-sharekey="${cal.shareKey}"
+             onclick="location.href='/schedule/detail/' + this.getAttribute('data-sharekey')">
             <span class="role-tag tag-member">참여</span>
-            <h3>개발 프로젝트 일정 💻</h3>
-            <p><i class="fa-solid fa-users"></i> 참여 인원: 3명</p>
+            <h3 th:text="${cal.title}">공유받은 일정 제목</h3>
+            <p>
+                <i class="fa-solid fa-calendar-days"></i>
+                생성일: <span th:text="${#temporals.format(cal.createdAt, 'yyyy-MM-dd')}">2026-05-28</span>
+            </p>
+        </div>
+
+        <div th:if="${#lists.isEmpty(memberCalendars)}" class="empty-state">
+            아직 공유받은 일정이 없어요. 친구에게 공유 코드를 받아보세요! 🔗
         </div>
     </div>
 </div>
 
-<!-- 🌟 새 일정 만들기 버튼 경로 수정: /schedule/new -->
 <a href="/schedule/new" class="fab" title="새 일정 만들기">
     <i class="fa-solid fa-plus"></i>
 </a>
