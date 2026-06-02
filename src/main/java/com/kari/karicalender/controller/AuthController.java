@@ -26,16 +26,23 @@ public class AuthController {
      * 시큐리티 로그인 실패 시 URL에 포함되는 error 파라미터를 감지하여 동적 에러 메시지를 전달합니다.
      *
      * @param error 시큐리티 로그인 실패 시 주소창에 들어오는 에러 여부 (?error)
+     * @param logout 시큐리티 로그아웃 성공 시 주소창에 들어오는 로그아웃 여부 (?logout)
      * @param model 화면에 에러 메시지를 전달하기 위한 스프링 Model 객체
      * @return login.html 뷰 템플릿
      */
     @GetMapping("/login")
     public String loginForm(@RequestParam(value = "error", required = false) String error,
+                            @RequestParam(value = "logout", required = false) String logout,
                             Model model) {
 
         // 스프링 시큐리티 로그인 실패 핸들러에 의해 ?error가 붙어서 들어왔을 때만 실행
         if (error != null) {
             model.addAttribute("error", "아이디 또는 비밀번호가 맞지 않아요. 다시 확인해주세요! 🌸");
+        }
+
+        // 2. 로그아웃 성공 후 시큐리티가 ?logout을 붙여줬을 때만 실행
+        if (logout != null) {
+            model.addAttribute("logoutMessage", "안전하게 로그아웃되었습니다! 다음에 또 만나요 🌸");
         }
 
         return "login";

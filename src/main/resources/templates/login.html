@@ -19,6 +19,10 @@
         </div>
         <button type="submit" class="btn-submit">시작하기</button>
 
+        <p th:if="${logoutMessage}" class="logout-msg" th:text="${logoutMessage}"
+           style="color: #2ec4b6; font-size: 0.85rem; margin-top: 10px; text-align: center; font-weight: bold;">
+        </p>
+
         <p th:if="${error}" class="error-msg" th:text="${error}"></p>
     </form>
     <a href="/" class="back-link">이전으로</a>

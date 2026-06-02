@@ -28,6 +28,16 @@
     </div>
 
     <a th:href="@{/schedule/main}" class="btn btn-login" style="display: block; text-decoration: none;">메인으로 돌아가기</a>
+
+    <div class="logout-container" style="margin-top: 20px; text-align: center;">
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <button type="submit" class="logout-btn" style="border: none; cursor: pointer;">
+                <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+            </button>
+        </form>
+    </div>
 </div>
 
 </body>

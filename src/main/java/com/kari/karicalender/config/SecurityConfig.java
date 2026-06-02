@@ -46,6 +46,13 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/schedule/main", false)
                         .permitAll()
                 )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")                // 로그아웃을 처리할 주소 (기본값)
+                        .logoutSuccessUrl("/login?logout")   // 로그아웃 성공 시 로그인 페이지로 가되, 주소창에 ?logout 표시 남기기!
+                        .invalidateHttpSession(true)          // 로그아웃 시 세션 다 날려버리기
+                        .deleteCookies("JSESSIONID")          // 시큐리티가 구워둔 쿠키도 삭제해서 완전 초기화
+                        .permitAll()
+                )
                 .userDetailsService(loginUserService);
 
         return http.build();

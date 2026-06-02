@@ -139,3 +139,21 @@ textarea { resize: none; }
 .color-option input { display: none; }
 
 .btn-cancel { background: none; border: none; color: #aaa; margin-top: 15px; cursor: pointer; text-decoration: underline; }
+
+
+/*로그아웃*/
+.logout-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #ffe5e7; /* 연한 핑크 톤 오렌지 */
+    color: #ff4d5d;           /* 진한 경고성 핑크레드 */
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+.logout-btn:hover {
+    background-color: #ff4d5d;
+    color: white;
+    transform: scale(1.05);
+}
