@@ -157,3 +157,9 @@ textarea { resize: none; }
     color: white;
     transform: scale(1.05);
 }
+
+/* 로그인 버튼 클릭/엔터 시 살짝 눌리는 쫀득한 효과 */
+.btn-submit:active {
+    transform: scale(0.98);
+    filter: brightness(0.9);
+}
