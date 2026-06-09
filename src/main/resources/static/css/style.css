@@ -163,3 +163,14 @@ textarea { resize: none; }
     transform: scale(0.98);
     filter: brightness(0.9);
 }
+
+/* 📅 메인 화면 일정 카드 마우스 올리면 둥실 뜨는 디테일 효과 */
+.calendar-card {
+    transition: all 0.25s ease-in-out; /* 부드럽게 움직이도록 애니메이션 */
+}
+
+.calendar-card:hover {
+    transform: translateY(-5px); /* 마우스 올리면 위로 5픽셀 슥 들림 */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* 그림자 진해지면서 입체감 뿜뿜 */
+    cursor: pointer;
+}
