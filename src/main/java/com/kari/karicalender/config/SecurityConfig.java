@@ -29,7 +29,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 로그인 하지 않은 사람도 볼 수 있는 설정
                         .requestMatchers("/", "/login", "/join", "/css/**", "/js/**").permitAll()
-                        .requestMatchers("/schedule/invite/**").authenticated()
                         .requestMatchers("/api/availability/**").authenticated()
                         //위에서 설정한 것 외에 모든 페이지는 로그인 해야 볼 수 있음
                         .anyRequest().authenticated()

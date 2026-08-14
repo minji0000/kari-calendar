@@ -27,7 +27,6 @@ public class ScheduleController {
      */
     @GetMapping("/new")
     public String newScheduleForm() {
-        // templates/calendar/new.html (파일 위치는 민지님 구조에 맞춰 확인!)
         return "calendar/new";
     }
 
@@ -62,7 +61,7 @@ public class ScheduleController {
 
         // 🌟 만약 참여자가 아니라면? 참여하기(초대) 페이지로 쫓아내기!
         if (participant == null) {
-            return "redirect:/schedule/invite/" + shareKey;
+            return "redirect:/invite/" + shareKey;
         }
 
         model.addAttribute("calendar", schedule);
