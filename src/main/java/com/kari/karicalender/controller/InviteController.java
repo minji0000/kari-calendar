@@ -20,10 +20,6 @@ public class InviteController {
 
     private final ScheduleService scheduleService;
 
-    /**
-     * 초대 링크 클릭 시 진입점
-     * GET /invite/{shareKey}
-     */
     @GetMapping("/{shareKey}")
     public String inviteEntry(@PathVariable String shareKey,
                               @AuthenticationPrincipal LoginUser loginUser,
@@ -34,6 +30,12 @@ public class InviteController {
         }
 
         Schedule schedule = scheduleService.findByShareKey(shareKey);
+
+        // 존재하지 않는 일정 키로 접근 시 메인 화면으로 방어
+        if (schedule == null) {
+            return "redirect:/schedule/main";
+        }
+
         boolean isParticipant = scheduleService.isParticipant(schedule, loginUser.getUser());
 
         if (isParticipant) {
@@ -43,7 +45,7 @@ public class InviteController {
         List<String> occupiedColors = scheduleService.getOccupiedColors(schedule);
 
         model.addAttribute("calendar", schedule);
-        model.addAttribute("occupiedColors", occupiedColors); // 👈 핵심!
+        model.addAttribute("occupiedColors", occupiedColors);
 
         return "calendar/invite";
     }
